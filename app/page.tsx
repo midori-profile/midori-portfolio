@@ -323,7 +323,7 @@ export default function Page() {
           </a>
         </div>
       </div>
-      <div className="prose prose-neutral dark:prose-invert">
+      <div className="prose-lg prose-neutral dark:prose-invert">
         <p>
           I've worked with and advised companies on{' '}
           <Link href="/blog/developer-marketing">developer marketing</Link>,{' '}

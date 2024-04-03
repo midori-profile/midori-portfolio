@@ -10,7 +10,7 @@ import { SandpackCSS } from './blog/[slug]/sandpack';
 export const metadata: Metadata = {
   metadataBase: new URL('https://leerob.io'),
   title: {
-    default: 'Lee Robinson',
+    default: 'Midori',
     template: '%s | Lee Robinson',
   },
   description: 'Developer, writer, and creator.',
@@ -62,7 +62,7 @@ export default function RootLayout({
       <head>
         <SandpackCSS />
       </head>
-      <body className="antialiased max-w-2xl mb-40 flex flex-col md:flex-row mx-4 mt-8 lg:mx-auto">
+      <body className="antialiased max-w-4xl mb-40 flex flex-col md:flex-row mx-4 mt-8 lg:mx-auto">
         <main className="flex-auto min-w-0 mt-6 flex flex-col px-2 md:px-0">
           <Navbar />
           {children}
