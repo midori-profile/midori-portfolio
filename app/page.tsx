@@ -60,7 +60,7 @@ function ChannelLink({
       <a
         href={link}
         target="_blank"
-        className="flex w-full items-center justify-between rounded border border-neutral-200 bg-neutral-50 px-4 py-4 dark:border-neutral-700 dark:bg-neutral-800"
+        className="flex w-full items-center justify-between rounded border border-neutral-200 bg-neutral-50 px-3 py-4 dark:border-neutral-700 dark:bg-neutral-800"
       >
         <div className="flex items-center space-x-3">
           {img && (
@@ -85,9 +85,11 @@ function ChannelLink({
             </div>
           )}
           <div className="flex flex-col">
-            <p className="font-bold text-neutral-900 dark:text-neutral-100">
+            <p className="font-medium prose prose-neutral">{name}</p>
+
+            {/* <p className="font-bold text-neutral-900 dark:text-neutral-100">
               {name}
-            </p>
+            </p> */}
             <Suspense fallback={<p className="h-6" />}>
               <Subs name={name} />
             </Suspense>
@@ -121,13 +123,13 @@ async function Subs({ name }: { name: string }) {
   }
 
   return (
-    <p className="text-neutral-600 dark:text-neutral-400">
+    <p className="prose prose-neutral pl-1">
       {counts} {name === "Professional Experience" ? "views" : "followers"}
     </p>
   );
 }
 
-function BlogLink({ slug, name }) {
+function BlogLink({ slug, name, subName }) {
   return (
     <div className="group">
       <a
@@ -135,11 +137,12 @@ function BlogLink({ slug, name }) {
         className="flex w-full items-center justify-between rounded border border-neutral-200 bg-neutral-50 px-3 py-4 dark:border-neutral-700 dark:bg-neutral-800"
       >
         <div className="flex flex-col">
-          <p className="font-medium text-neutral-900 dark:text-neutral-100">
-            {name}
-          </p>
+          <p className="font-medium prose prose-neutral">{name}</p>
           <Suspense fallback={<p className="h-6" />}>
-            <Views slug={slug} />
+            <div className="flex flex-col sm:flex-row">
+              <p className="prose prose-neutral pr-2">{subName}</p>
+              <Views slug={slug} />
+            </div>
           </Suspense>
         </div>
         <div className="transform text-neutral-700 transition-transform duration-300 group-hover:-rotate-12 dark:text-neutral-300">
@@ -155,237 +158,353 @@ async function Views({ slug }: { slug: string }) {
   return <ViewCounter allViews={views} slug={slug} />;
 }
 
+interface LinkComponentProps {
+  href: string;
+  children: React.ReactNode;
+}
+
+const LinkComponent: React.FC<LinkComponentProps> = ({ href, children }) => (
+  <span>
+    {" "}
+    <a href={href} className="underline text-black hover:text-gray-800">
+      {children}
+    </a>{" "}
+  </span>
+);
+
 export default function Page() {
   return (
     <section>
       <PreloadResources />
-      <h1 className="mb-8 text-2xl font-medium tracking-tighter">
-        Hi 👋, I'm Midori.
+      <h1 className="text-2xl font-medium tracking-tighter">
+        Hi 👋, I'm Midori.{" "}
       </h1>
-      <p className="prose-lg prose-neutral text-gray-500">
-        {`A passionate full stack developer currently living in 🇯🇵 Tokyo, Japan. You can check out some of my work on my Github or Portfolio:`}
-      </p>
-      <div className="my-6 flex w-full flex-col space-x-0 space-y-4 sm:flex-row sm:space-x-4 sm:space-y-0">
-        <ChannelLink
-          img={avatar}
-          name="@Midori"
-          link="https://github.com/midori-profile"
-        />
-        <ChannelLink name="Professional Experience" link="/work" />
+      <div className="pt-6">
+        <p className="prose prose-neutral">
+          {`A passionate full stack developer currently living in 🇯🇵 Tokyo, Japan. I am well-adapted to remote work cultures, Feel free to explore my projects on Github or my Portfolio:`}
+        </p>
+        <div className="my-4 flex w-full flex-col space-x-0 space-y-4 sm:flex-row sm:space-x-4 sm:space-y-0">
+          <ChannelLink
+            img={avatar}
+            name="@Midori"
+            link="https://github.com/midori-profile"
+          />
+          <ChannelLink name="Professional Experience" link="/work" />
+        </div>
       </div>
-      <p className="prose-lg prose-neutral text-gray-500">
-        {`I've outlined some of my key technical strengths, which are divided into three main categories: Front-End Technology Stack, Efficiency & Performance Optimization, and Full-Stack Development.`}
-      </p>
-      <div className="prose-lg max-w-screen-xl mx-auto bg-white min-h-sceen w-full">
-        <div className="divide-y divide-neutral-200 mx-auto mt-8">
-          <div className="py-5">
+      <div className="pt-6">
+        <h2 className="font-medium text-xl mb-1 tracking-tighter">
+          I. Technical Highlights
+        </h2>
+        <p className="prose prose-neutral">
+          {`I've outlined some of my key technical strengths, which are divided into three main categories, click to show details`}
+        </p>
+        <div className="my-4 max-w-screen-xl mx-auto min-h-sceen w-full border border-neutral-200">
+          <div className="divide-y divide-neutral-200 mx-auto">
             <details className="group" open>
-              <summary className="flex justify-between items-center font-medium cursor-pointer list-none">
-                <span className="font-bold text-neutral-900">
-                  {" "}
-                  Front-End Technology Stack
-                </span>
+              <summary className="flex justify-between items-center cursor-pointer list-none rounded px-3 py-4 bg-neutral-50">
+                <p className="prose prose-neutral font-medium">
+                  1. Front-End Technology Stack
+                </p>
                 <span className="transition group-open:rotate-180">
                   <svg
                     fill="none"
-                    height="24"
+                    height="22"
                     shape-rendering="geometricPrecision"
                     stroke="currentColor"
                     stroke-linecap="round"
                     stroke-linejoin="round"
                     stroke-width="1.5"
                     viewBox="0 0 24 24"
-                    width="24"
+                    width="22"
                   >
                     <path d="M6 9l6 6 6-6"></path>
                   </svg>
                 </span>
               </summary>
-              <p className="text-gray-500 mt-3 group-open:animate-fadeIn">
-              Expert in large-scale front-end frameworks, such as Vue and React,Had deep dive into React's source code
-              </p>
-              <p className="text-gray-500 mt-3 group-open:animate-fadeIn">
-              Designed and developed the Baidu Mini-App framework, serving 300k mini-program,
-              and obtained 2 technical patents.
+              <div className="px-3 py-4">
+                <p className="prose prose-neutral">
+                  Expert in large-scale front-end frameworks, such as Vue and
+                  React , Had
+                  <LinkComponent href="https://en.wikipedia.org/wiki/Tencent">
+                    deep dive into React's source code
+                  </LinkComponent>
+                </p>
+                <p className="prose prose-neutral">
+                  Designed and developed the
+                  <LinkComponent href="https://en.wikipedia.org/wiki/Tencent">
+                    Baidu Mini-App framework
+                  </LinkComponent>
+                  , serving 300k mini-program merchants, obtained
+                  <LinkComponent href="https://en.wikipedia.org/wiki/Tencent">
+                    2 technical patents.
+                  </LinkComponent>
+                </p>
+                <p className="prose prose-neutral">
+                  Experienced in Javascript and Typescript, Founder and
+                  instructor of
+                  <LinkComponent href="https://ife.baidu.com/introduction.html">
+                    Baidu Front End Academy
+                  </LinkComponent>
+                  , delivering Javascript/Typescript courses to over 60k college
+                  students.
+                </p>
+              </div>
+            </details>
+            <details className="group">
+              <summary className="flex justify-between items-center cursor-pointer list-none rounded px-3 py-4 bg-neutral-50">
+                <p className="prose prose-neutral font-medium">
+                  2. Efficiency & Performance Optimization
+                </p>
+                <span className="transition group-open:rotate-180">
+                  <svg
+                    fill="none"
+                    height="22"
+                    shape-rendering="geometricPrecision"
+                    stroke="currentColor"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="1.5"
+                    viewBox="0 0 24 24"
+                    width="22"
+                  >
+                    <path d="M6 9l6 6 6-6"></path>
+                  </svg>
+                </span>
+              </summary>
+              <div className="px-3 py-4">
+                <p className="prose prose-neutral">
+                  Led the team's CI/CD works, Experienced in CI/CD
+                  methodologies,
+                  <LinkComponent href="https://ife.baidu.com/introduction.html">
+                    Kubernetes
+                  </LinkComponent>
+                  , Helm , Shell scripting, GitHub Actions, and{" "}
+                  <LinkComponent href="https://ife.baidu.com/introduction.html">
+                    Pulumi.
+                  </LinkComponent>
+                </p>
+                <p className="prose prose-neutral">
+                  Specializing in front-end performance optimization. Developed
+                  <LinkComponent href="https://ife.baidu.com/introduction.html">
+                    monitoring and optimization tools{" "}
+                  </LinkComponent>
+                  for{" "}
+                  <LinkComponent href="https://www.tencentcloud.com/">
+                    Tencent Cloud{" "}
+                  </LinkComponent>
+                  Products, serving tens of millions of users.
+                </p>
+                <p className="prose prose-neutral">
+                  Led Team's front-end testing strategy, provided comprehensive
+                  E2E test and{" "}
+                  <LinkComponent href="https://www.tencentcloud.com/">
+                    Cypress automation tool
+                  </LinkComponent>
+                </p>
+              </div>
+            </details>
+            <details className="group">
+              <summary className="flex justify-between items-center cursor-pointer list-none rounded px-3 py-4 bg-neutral-50">
+                <p className="prose prose-neutral font-medium">3. Full Stack</p>
+                <span className="transition group-open:rotate-180">
+                  <svg
+                    fill="none"
+                    height="22"
+                    shape-rendering="geometricPrecision"
+                    stroke="currentColor"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="1.5"
+                    viewBox="0 0 24 24"
+                    width="22"
+                  >
+                    <path d="M6 9l6 6 6-6"></path>
+                  </svg>
+                </span>
+              </summary>
+              <div className="px-3 py-4">
+                <p className="prose prose-neutral">
+                  Proficient in Node.js, with experience in Koa, Express, and
+                  NestJS
+                </p>
+              </div>
+            </details>
+          </div>
+        </div>
+      </div>
+      <div className="pt-6">
+        <h2 className="font-medium text-xl mb-1 tracking-tighter">
+          II. Open source projects
+        </h2>
+        <p className="prose prose-neutral">
+          I enjoy creating tools to enhance work efficiency and quality. Here
+          are some tools I've developed, give it a try!
+        </p>
+        <div className="my-4 flex flex-col sm:flex-row w-full space-y-2 sm:space-x-2 sm:space-y-0 overflow-x-auto">
+          <div className="flex items-center justify-between rounded border border-neutral-200 bg-neutral-50 px-3 py-4">
+            <a href="https://linear.app">
+              <svg width="78" height="20" role="img" aria-label="Linear logo">
+                <use href="/sprite.svg#linear" />
+              </svg>
+            </a>
+          </div>
+          <div className="flex items-center justify-between rounded border border-neutral-200 bg-neutral-50 px-3 py-4">
+            <a href="https://supabase.com">
+              <svg
+                width="100"
+                height="19"
+                role="img"
+                aria-label="Supabase logo"
+              >
+                <use href="/sprite.svg#supabase" />
+              </svg>
+            </a>
+          </div>
+          <div className="flex items-center justify-between rounded border border-neutral-200 bg-neutral-50 px-3 py-4">
+            <a href="https://www.makeswift.com/blog/makeswift-is-joining-bigcommerce">
+              <svg
+                width="96"
+                height="19"
+                role="img"
+                aria-label="Makeswift logo"
+              >
+                <use href="/sprite.svg#makeswift" />
+              </svg>
+            </a>
+          </div>
+        </div>
+      </div>
+      <div className="pt-6">
+        <h2 className="font-medium text-xl mb-1 tracking-tighter">
+          III. My Technique Posts
+        </h2>
+        <p className="prose prose-neutral dark:prose-invert">
+          I enjoy learning and sharing. Below are some of my past works and
+          shares (confidential content removed).
+        </p>
+        <div className="my-4 flex w-full flex-col space-y-4">
+          <BlogLink
+            name="What Makes A Great Developer Experience?"
+            subName={"cross-platform development, and browser."}
+            slug="developer-experience-examples"
+          />
+          <BlogLink
+            name="What Makes A Great Developer Experience?"
+            subName={"cross-platform development, and browser."}
+            slug="developer-experience-examples"
+          />
+          <BlogLink
+            name="What Makes A Great Developer Experience?"
+            subName={
+              "cross-platform development, and browser.platform development"
+            }
+            slug="developer-experience-examples"
+          />
+        </div>
+      </div>
+      <div className="pt-6">
+        <h2 className="font-medium text-xl mb-1 tracking-tighter">
+          IV. Languages I Speak
+        </h2>
+        <p className="prose prose-neutral">
+          {`I can speak three languages and can work in English smoothly.`}
+        </p>
+        <div className="prose prose-neutral my-4">
+          <ul className="list-disc list-inside space-y-2">
+            <li>
+              <span>Chinese -- </span>
+              <span>Native Speaker</span>
+            </li>
+            <li>
+              <span>English -- </span>
+              <span>
+                IELTS score of 7. Worked in an English-speaking environment for
+                years.
+              </span>
+            </li>
+            <li>
+              <span>Japanese -- </span>
+              <span>Capable of daily conversations and living.</span>
+            </li>
+          </ul>
+        </div>
+        {/* <table className="prose prose-neutral my-4 min-w-full overflow-hidden text-left rounded border border-neutral-200">
+          <thead className="bg-neutral-50 rounded w-full">
+            <tr>
+              <th className="px-3 py-4">Language</th>
+              <th className="prose prose-neutral px-3 py-4">Proficiency</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr className="border border-neutral-200 bg-white">
+              <td className="px-3 py-4">Chinese</td>
+              <td className="px-3 py-4">Native Speaker</td>
+            </tr>
+            <tr className="bg-white border-b dark:bg-gray-800 dark:border-gray-700">
+              <td className="px-3 py-4">English</td>
+              <td className="px-3 py-4">
+                IELTS score of 7. Worked in an English-speaking environment for
+                years.
+              </td>
+            </tr>
+            <tr className="bg-white dark:bg-gray-800">
+              <td className="px-3 py-4">Japanese</td>
+              <td className="px-3 py-4">
+                Conversational proficiency for daily life.
+              </td>
+            </tr>
+          </tbody>
+        </table> */}
+      </div>
+      <div className="pt-6">
+        <h2 className="font-medium text-xl mb-1 tracking-tighter">
+          V. Some Interesting Things
+        </h2>
+        <p className="prose prose-neutral">
+          Besides programming, I also served as a designer for
+          <LinkComponent href="https://en.wikipedia.org/wiki/Tencent">
+            Echarts
+          </LinkComponent>
+          team for two years. I enjoy photography and design a lot. Check some
+          of my works:
+        </p>
 
-              </p>
-              <p>
-              Experienced in Javascript and Typescript, Founder and instructor of Baidu Front End Academy, delivering Javascript/Typescript courses to over 60k college students.
-              </p>
-            </details>
-          </div>
-          <div className="py-5">
-            <details className="group" open>
-              <summary className="flex justify-between items-center font-medium cursor-pointer list-none">
-                <span className="font-bold text-neutral-900">
-                  {" "}
-                  Efficiency & Performance Optimization:
-                </span>
-                <span className="transition group-open:rotate-180">
-                  <svg
-                    fill="none"
-                    height="24"
-                    shape-rendering="geometricPrecision"
-                    stroke="currentColor"
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    stroke-width="1.5"
-                    viewBox="0 0 24 24"
-                    width="24"
-                  >
-                    <path d="M6 9l6 6 6-6"></path>
-                  </svg>
-                </span>
-              </summary>
-              <p className="text-gray-500 mt-3 group-open:animate-fadeIn">
-                SAAS platform is a cloud-based software service that allows
-                users to access and use a variety of tools and functionality.
-              </p>
-            </details>
-          </div>
-          <div className="py-5">
-            <details className="group" open>
-              <summary className="flex justify-between items-center font-medium cursor-pointer list-none">
-                <span className="font-bold text-neutral-900">
-                  {" "}
-                  Front-End Technology Stack
-                </span>
-                <span className="transition group-open:rotate-180">
-                  <svg
-                    fill="none"
-                    height="24"
-                    shape-rendering="geometricPrecision"
-                    stroke="currentColor"
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    stroke-width="1.5"
-                    viewBox="0 0 24 24"
-                    width="24"
-                  >
-                    <path d="M6 9l6 6 6-6"></path>
-                  </svg>
-                </span>
-              </summary>
-              <p className="text-gray-500 mt-3 group-open:animate-fadeIn">
-                SAAS platform is a cloud-based software service that allows
-                users to access and use a variety of tools and functionality.
-              </p>
-            </details>
-          </div>
-        </div>
+        <ul className="font-sm mt-8 flex flex-col space-x-0 space-y-2 text-neutral-600 md:flex-row md:space-x-4 md:space-y-0 dark:text-neutral-300">
+          <li>
+            <a
+              className="flex items-center transition-all hover:text-neutral-800 dark:hover:text-neutral-100"
+              rel="noopener noreferrer"
+              target="_blank"
+              href="https://leerob.substack.com"
+            >
+              <ArrowIcon />
+              <p className="ml-2 h-7">View my design work</p>
+            </a>
+          </li>
+          <li>
+            <a
+              className="flex items-center transition-all hover:text-neutral-800 dark:hover:text-neutral-100"
+              rel="noopener noreferrer"
+              target="_blank"
+              href="https://leerob.substack.com"
+            >
+              <ArrowIcon />
+              <p className="ml-2 h-7">My photography work</p>
+            </a>
+          </li>
+        </ul>
       </div>
-      <div className="prose prose-neutral dark:prose-invert">
-        <p>
-        I enjoy creating tools to enhance work efficiency and quality. Give it a try!
-        </p>
-      </div>
-      <div className="my-8 flex h-14 w-full flex-row space-x-2 overflow-x-auto">
-        <div className="flex items-center justify-between rounded border border-neutral-200 bg-neutral-50 px-3 py-4 dark:border-neutral-700 dark:bg-neutral-800">
-          <a href="https://linear.app">
-            <svg width="78" height="20" role="img" aria-label="Linear logo">
-              <use href="/sprite.svg#linear" />
-            </svg>
-          </a>
-        </div>
-        <div className="flex items-center justify-between rounded border border-neutral-200 bg-neutral-50 px-3 py-4 dark:border-neutral-700 dark:bg-neutral-800">
-          <a href="https://supabase.com">
-            <svg width="100" height="19" role="img" aria-label="Supabase logo">
-              <use href="/sprite.svg#supabase" />
-            </svg>
-          </a>
-        </div>
-        <div className="flex items-center justify-between rounded border border-neutral-200 bg-neutral-50 px-3 py-4 dark:border-neutral-700 dark:bg-neutral-800">
-          <a href="https://www.makeswift.com/blog/makeswift-is-joining-bigcommerce">
-            <svg width="96" height="19" role="img" aria-label="Makeswift logo">
-              <use href="/sprite.svg#makeswift" />
-            </svg>
-          </a>
-        </div>
-        <div className="flex items-center justify-between rounded border border-neutral-200 bg-neutral-50 px-3 py-4 dark:border-neutral-700 dark:bg-neutral-800">
-          <a href="https://resend.com">
-            <svg width="70" height="17" role="img" aria-label="Resend logo">
-              <use href="/sprite.svg#resend" />
-            </svg>
-          </a>
-        </div>
-        <div className="flex items-center justify-between rounded border border-neutral-200 bg-neutral-50 px-3 py-4 dark:border-neutral-700 dark:bg-neutral-800">
-          <a href="https://bun.sh">
-            <svg width="35" height="27" role="img" aria-label="Bun logo">
-              <use href="/sprite.svg#bun" />
-            </svg>
-          </a>
-        </div>
-      </div>
-      <div className="prose prose-neutral dark:prose-invert">
-        <p>
-        I enjoy learning and sharing. Below are some of my past works and shares (confidential content removed)
-        </p>
-      </div>
-      <div className="my-8 flex w-full flex-col space-y-4">
-        <BlogLink
-          name="What Makes A Great Developer Experience?"
-          slug="developer-experience-examples"
-        />
-      </div>
-      <div className="prose-lg prose-neutral dark:prose-invert">
-        <p>
-          I've worked with and advised companies on{" "}
-          <Link href="/blog/developer-marketing">developer marketing</Link>,{" "}
-          <Link href="/blog/devrel-at-vercel">developer relations</Link>,
-          building open-source communities, product-led growth, and more.
-        </p>
-      </div>
-      <h3>IV. Languages I Speak</h3>
-<table>
-  <tr>
-    <th>Language</th>
-    <th>Proficiency</th>
-  </tr>
-  <tr>
-    <td>Chinese</td>
-    <td>Native Speaker</td>
-  </tr>
-  <tr>
-    <td>English</td>
-    <td>IELTS score of 7. Worked in an English-speaking environment for years.</td>
-  </tr>
-  <tr>
-    <td>Japanese</td>
-    <td>Conversational proficiency for daily life.</td>
-  </tr>
-</table>
-<h3>V. Some Interesting Things</h3>
-<p>Besides programming, I also enjoy photography and design. Check some of my works:</p>
-
-<table>
-  <tr>
-    <th>Design</th>
-    <th>Photography</th>
-  </tr>
-  <tr>
-    <td>
-      Served as a designer for the <a href="https://echarts.apache.org/" target="_blank">echarts team</a> for two years. <br>View some of my design work on 
-      <a href="https://dribbble.com/ceadatian" target="_blank">Dribbble</a>
-    </td>
-    <td>
-      Check out my photography work:
-      <a href="" target="_blank"><img src="https://upload.wikimedia.org/wikipedia/commons/thumb/e/e7/Instagram_logo_2016.svg/1024px-Instagram_logo_2016.svg.png" width="20"/> @ivymidori</a>
-    </td>
-  </tr>
-</table>
-      <ul className="font-sm mt-8 flex flex-col space-x-0 space-y-2 text-neutral-600 md:flex-row md:space-x-4 md:space-y-0 dark:text-neutral-300">
-        <li>
-          <a
-            className="flex items-center transition-all hover:text-neutral-800 dark:hover:text-neutral-100"
-            rel="noopener noreferrer"
-            target="_blank"
-            href="https://leerob.substack.com"
-          >
-            <ArrowIcon />
-            <p className="ml-2 h-7"> Send me email</p>
-          </a>
-        </li>
-      </ul>
+      {/* put it into guest book */}
+      {/* <a
+        className="flex items-center transition-all hover:text-neutral-800 dark:hover:text-neutral-100"
+        rel="noopener noreferrer"
+        target="_blank"
+        href="https://leerob.substack.com"
+      >
+        <ArrowIcon />
+        <p className="ml-2 h-7"> Send me email</p>
+      </a> */}
     </section>
   );
 }
