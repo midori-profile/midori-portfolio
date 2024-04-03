@@ -7,17 +7,17 @@ import {
   unstable_noStore as noStore,
 } from 'next/cache';
 
-let googleAuth = new auth.GoogleAuth({
-  credentials: {
-    client_email: process.env.GOOGLE_CLIENT_EMAIL,
-    private_key: process.env.GOOGLE_PRIVATE_KEY,
-  },
-  scopes: ['https://www.googleapis.com/auth/youtube.readonly'],
-});
+// let googleAuth = new auth.GoogleAuth({
+//   credentials: {
+//     client_email: process.env.GOOGLE_CLIENT_EMAIL ?? '',
+//     private_key: process.env.GOOGLE_PRIVATE_KEY ?? '',
+//   },
+//   scopes: ['https://www.googleapis.com/auth/youtube.readonly'],
+// });
 
 let yt = youtube({
   version: 'v3',
-  auth: googleAuth,
+  // auth: googleAuth,
 });
 
 export async function getBlogViews() {

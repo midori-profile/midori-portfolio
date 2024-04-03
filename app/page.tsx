@@ -1,22 +1,23 @@
-import { Suspense } from 'react';
-import { unstable_noStore as noStore } from 'next/cache';
-import Link from 'next/link';
-import Image from 'next/image';
-import smashing from 'public/images/home/smashing.jpg';
-import summit from 'public/images/home/summit.jpg';
-import reactathon from 'public/images/home/reactathon.jpg';
-import ship from 'public/images/home/ship.jpg';
-import filming from 'public/images/home/filming.jpg';
-import meetups from 'public/images/home/meetups.jpg';
-import vercel from 'public/images/home/vercel.jpg';
-import avatar from 'app/avatar.jpg';
-import ViewCounter from 'app/blog/view-counter';
-import { PreloadResources } from 'app/preload';
+import { Suspense } from "react";
+import { unstable_noStore as noStore } from "next/cache";
+import Link from "next/link";
+import Image, { StaticImageData } from "next/image";
+import smashing from "public/images/home/smashing.jpg";
+import summit from "public/images/home/summit.jpg";
+import reactathon from "public/images/home/reactathon.jpg";
+import ship from "public/images/home/ship.jpg";
+import filming from "public/images/home/filming.jpg";
+import meetups from "public/images/home/meetups.jpg";
+import vercel from "public/images/home/vercel.jpg";
+import avatar from "app/avatar.jpg";
+import ViewCounter from "app/blog/view-counter";
+import { PreloadResources } from "app/preload";
+import Accordion from "./accordiont";
 import {
   getLeeYouTubeSubs,
   getVercelYouTubeSubs,
   getViewsCount,
-} from 'app/db/queries';
+} from "app/db/queries";
 
 function Badge(props) {
   return (
@@ -45,33 +46,46 @@ function ArrowIcon() {
   );
 }
 
-function ChannelLink({ img, link, name }) {
+function ChannelLink({
+  img,
+  link,
+  name,
+}: {
+  img?: StaticImageData;
+  link: string;
+  name: string;
+}) {
   return (
     <div className="group flex w-full">
       <a
         href={link}
         target="_blank"
-        className="flex w-full items-center justify-between rounded border border-neutral-200 bg-neutral-50 px-3 py-4 dark:border-neutral-700 dark:bg-neutral-800"
+        className="flex w-full items-center justify-between rounded border border-neutral-200 bg-neutral-50 px-4 py-4 dark:border-neutral-700 dark:bg-neutral-800"
       >
         <div className="flex items-center space-x-3">
-          <div className="relative h-16">
-            <Image
-              alt={name}
-              src={img}
-              height={64}
-              width={64}
-              sizes="33vw"
-              className="h-16 w-16 rounded-full border border-neutral-200 dark:border-neutral-700"
-              priority
-            />
-            <div className="relative -right-10 -top-6 inline-flex h-6 w-6 items-center rounded-full border border-neutral-200 bg-white p-1 dark:border-neutral-700">
-              <svg width="15" height="11" role="img" aria-label="YouTube logo">
-                <use href="/sprite.svg#youtube" />
-              </svg>
+          {img && (
+            <div className="relative h-16">
+              <Image
+                alt={name}
+                src={img}
+                height={64}
+                width={64}
+                sizes="33vw"
+                className="h-16 w-16 rounded-full border border-neutral-200 dark:border-neutral-700"
+                priority
+              />
+              <div className="relative -right-10 -top-6 inline-flex h-6 w-6 items-center rounded-full border border-neutral-200 bg-white p-1">
+                <img
+                  alt="GitHub logo"
+                  src="/github-logo.svg"
+                  width="20"
+                  height="20"
+                />
+              </div>
             </div>
-          </div>
+          )}
           <div className="flex flex-col">
-            <p className="font-medium text-neutral-900 dark:text-neutral-100">
+            <p className="font-bold text-neutral-900 dark:text-neutral-100">
               {name}
             </p>
             <Suspense fallback={<p className="h-6" />}>
@@ -87,18 +101,28 @@ function ChannelLink({ img, link, name }) {
   );
 }
 
+async function getMidoriFollowers() {
+  const response = await fetch("https://api.github.com/users/midori-profile");
+  const data = await response.json();
+  return data.followers;
+}
+
 async function Subs({ name }: { name: string }) {
   noStore();
-  let subscribers;
-  if (name === '@leerob') {
-    subscribers = await getLeeYouTubeSubs();
+  let counts;
+  if (name === "@Midori") {
+    // Replace this with the actual function to get @Midori's followers
+    counts = await getMidoriFollowers();
+  } else if (name === "Professional Experience") {
+    // Replace this with the actual function to get the total article views
+    // counts = await getTotalArticleViews();
   } else {
-    subscribers = await getVercelYouTubeSubs();
+    counts = 200;
   }
 
   return (
     <p className="text-neutral-600 dark:text-neutral-400">
-      {subscribers} subscribers
+      {counts} {name === "Professional Experience" ? "views" : "followers"}
     </p>
   );
 }
@@ -136,154 +160,123 @@ export default function Page() {
     <section>
       <PreloadResources />
       <h1 className="mb-8 text-2xl font-medium tracking-tighter">
-        hey, I'm leerob 👋
+        Hi 👋, I'm Midori.
       </h1>
-      <p className="prose prose-neutral dark:prose-invert">
-        {`I'm a frontend developer, optimist, and community builder. I currently `}
-        <Link href="/work">work</Link>
-        {` as the VP of Product at `}
-        <span className="not-prose">
-          <Badge href="https://vercel.com/home">
-            <svg
-              width="13"
-              height="11"
-              role="img"
-              aria-label="Vercel logo"
-              className="mr-1 inline-flex"
-            >
-              <use href="/sprite.svg#vercel" />
-            </svg>
-            Vercel
-          </Badge>
-        </span>
-        {`, where I help teach the `}
-        <Badge href="https://nextjs.org">
-          <img
-            alt="Next.js logomark"
-            src="/next-logo.svg"
-            className="!mr-1"
-            width="14"
-            height="14"
-          />
-          Next.js
-        </Badge>
-        {` community, an open-source web framework built with `}
-        <Badge href="https://react.dev">
-          <svg
-            width="14"
-            height="14"
-            role="img"
-            aria-label="React logo"
-            className="!mr-1"
-          >
-            <use href="/sprite.svg#react" />
-          </svg>
-          React
-        </Badge>
-        .
+      <p className="prose-lg prose-neutral text-gray-500">
+        {`A passionate full stack developer currently living in 🇯🇵 Tokyo, Japan. You can check out some of my work on my Github or Portfolio:`}
       </p>
-      <div className="my-8 columns-2 gap-4 sm:columns-3">
-        <div className="relative mb-4 h-40">
-          <Image
-            alt="Me speaking on stage at React Summit about the future of Next.js"
-            src={summit}
-            fill
-            sizes="(max-width: 768px) 213px, 33vw"
-            priority
-            className="rounded-lg object-cover"
-          />
-        </div>
-        <div className="relative mb-4 h-80 sm:mb-0">
-          <Image
-            alt="Me, Lydia, and Delba filming the Next.js Conf keynote"
-            src={filming}
-            fill
-            sizes="(max-width: 768px) 213px, 33vw"
-            priority
-            className="rounded-lg object-cover object-[-16px] sm:object-center"
-          />
-        </div>
-        <div className="relative h-40 sm:mb-4 sm:h-80">
-          <Image
-            alt="Me standing on stage at Reactathon delivering the keynote"
-            src={reactathon}
-            fill
-            sizes="(max-width: 768px) 213px, 33vw"
-            priority
-            className="rounded-lg object-cover object-top sm:object-center"
-          />
-        </div>
-        <div className="relative mb-4 h-40 sm:mb-0">
-          <Image
-            alt="Me standing on stage at SmashingConf giving a talk about my optimism for the web"
-            src={smashing}
-            fill
-            sizes="(max-width: 768px) 213px, 33vw"
-            priority
-            className="rounded-lg object-cover"
-          />
-        </div>
-        <div className="relative mb-4 h-40">
-          <Image
-            alt="Me and Guillermo Rauch on stage for Vercel Ship, answering questions from the Next.js community"
-            src={ship}
-            fill
-            sizes="(max-width: 768px) 213px, 33vw"
-            priority
-            className="rounded-lg object-cover"
-          />
-        </div>
-        <div className="relative h-80">
-          <Image
-            alt="My badge on top of a pile of badges from a Vercel meetup we held"
-            src={meetups}
-            fill
-            sizes="(min-width: 768px) 213px, 33vw"
-            priority
-            className="rounded-lg object-cover"
-          />
-        </div>
-      </div>
-      <div className="prose prose-neutral dark:prose-invert">
-        <p>
-          I create educational content for developers, teaching them about web
-          development, JavaScript and TypeScript, React and Next.js, and more.
-          This comes in all forms: blog posts, videos, tweets, conference talks,
-          and workshops. You can watch some of my favorites below.
-        </p>
-      </div>
-      <div className="my-8 flex w-full flex-col space-x-0 space-y-4 sm:flex-row sm:space-x-4 sm:space-y-0">
+      <div className="my-6 flex w-full flex-col space-x-0 space-y-4 sm:flex-row sm:space-x-4 sm:space-y-0">
         <ChannelLink
           img={avatar}
-          name="@leerob"
-          link="https://www.youtube.com/@leerob"
+          name="@Midori"
+          link="https://github.com/midori-profile"
         />
-        <ChannelLink
-          img={vercel}
-          name="@vercel"
-          link="https://www.youtube.com/@vercelhq"
-        />
+        <ChannelLink name="Professional Experience" link="/work" />
+      </div>
+      <p className="prose-lg prose-neutral text-gray-500">
+        {`I've outlined some of my key technical strengths, which are divided into three main categories: Front-End Technology Stack, Efficiency & Performance Optimization, and Full-Stack Development.`}
+      </p>
+      <div className="prose-lg max-w-screen-xl mx-auto bg-white min-h-sceen w-full">
+        <div className="divide-y divide-neutral-200 mx-auto mt-8">
+          <div className="py-5">
+            <details className="group" open>
+              <summary className="flex justify-between items-center font-medium cursor-pointer list-none">
+                <span className="font-bold text-neutral-900">
+                  {" "}
+                  Front-End Technology Stack
+                </span>
+                <span className="transition group-open:rotate-180">
+                  <svg
+                    fill="none"
+                    height="24"
+                    shape-rendering="geometricPrecision"
+                    stroke="currentColor"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="1.5"
+                    viewBox="0 0 24 24"
+                    width="24"
+                  >
+                    <path d="M6 9l6 6 6-6"></path>
+                  </svg>
+                </span>
+              </summary>
+              <p className="text-gray-500 mt-3 group-open:animate-fadeIn">
+              Expert in large-scale front-end frameworks, such as Vue and React,Had deep dive into React's source code
+              </p>
+              <p className="text-gray-500 mt-3 group-open:animate-fadeIn">
+              Designed and developed the Baidu Mini-App framework, serving 300k mini-program,
+              and obtained 2 technical patents.
+
+              </p>
+              <p>
+              Experienced in Javascript and Typescript, Founder and instructor of Baidu Front End Academy, delivering Javascript/Typescript courses to over 60k college students.
+              </p>
+            </details>
+          </div>
+          <div className="py-5">
+            <details className="group" open>
+              <summary className="flex justify-between items-center font-medium cursor-pointer list-none">
+                <span className="font-bold text-neutral-900">
+                  {" "}
+                  Efficiency & Performance Optimization:
+                </span>
+                <span className="transition group-open:rotate-180">
+                  <svg
+                    fill="none"
+                    height="24"
+                    shape-rendering="geometricPrecision"
+                    stroke="currentColor"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="1.5"
+                    viewBox="0 0 24 24"
+                    width="24"
+                  >
+                    <path d="M6 9l6 6 6-6"></path>
+                  </svg>
+                </span>
+              </summary>
+              <p className="text-gray-500 mt-3 group-open:animate-fadeIn">
+                SAAS platform is a cloud-based software service that allows
+                users to access and use a variety of tools and functionality.
+              </p>
+            </details>
+          </div>
+          <div className="py-5">
+            <details className="group" open>
+              <summary className="flex justify-between items-center font-medium cursor-pointer list-none">
+                <span className="font-bold text-neutral-900">
+                  {" "}
+                  Front-End Technology Stack
+                </span>
+                <span className="transition group-open:rotate-180">
+                  <svg
+                    fill="none"
+                    height="24"
+                    shape-rendering="geometricPrecision"
+                    stroke="currentColor"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="1.5"
+                    viewBox="0 0 24 24"
+                    width="24"
+                  >
+                    <path d="M6 9l6 6 6-6"></path>
+                  </svg>
+                </span>
+              </summary>
+              <p className="text-gray-500 mt-3 group-open:animate-fadeIn">
+                SAAS platform is a cloud-based software service that allows
+                users to access and use a variety of tools and functionality.
+              </p>
+            </details>
+          </div>
+        </div>
       </div>
       <div className="prose prose-neutral dark:prose-invert">
         <p>
-          Over the past decade, I've written content on my blog and newsletter.
-          I try to keep things simple. You'll find writing about technologies
-          I'm interested in at the time, or how I'm learning and growing in my
-          career, sharing knowledge along the way.
-        </p>
-      </div>
-      <div className="my-8 flex w-full flex-col space-y-4">
-        <BlogLink
-          name="What Makes A Great Developer Experience?"
-          slug="developer-experience-examples"
-        />
-        <BlogLink name="What is Developer Relations?" slug="devrel-at-vercel" />
-        <BlogLink name="The Story of Heroku" slug="heroku" />
-      </div>
-      <div className="prose prose-neutral dark:prose-invert">
-        <p>
-          I invest small angel checks into early stage startups building tools
-          for developers.
+        I enjoy creating tools to enhance work efficiency and quality. Give it a try!
         </p>
       </div>
       <div className="my-8 flex h-14 w-full flex-row space-x-2 overflow-x-auto">
@@ -323,26 +316,64 @@ export default function Page() {
           </a>
         </div>
       </div>
+      <div className="prose prose-neutral dark:prose-invert">
+        <p>
+        I enjoy learning and sharing. Below are some of my past works and shares (confidential content removed)
+        </p>
+      </div>
+      <div className="my-8 flex w-full flex-col space-y-4">
+        <BlogLink
+          name="What Makes A Great Developer Experience?"
+          slug="developer-experience-examples"
+        />
+      </div>
       <div className="prose-lg prose-neutral dark:prose-invert">
         <p>
-          I've worked with and advised companies on{' '}
-          <Link href="/blog/developer-marketing">developer marketing</Link>,{' '}
+          I've worked with and advised companies on{" "}
+          <Link href="/blog/developer-marketing">developer marketing</Link>,{" "}
           <Link href="/blog/devrel-at-vercel">developer relations</Link>,
           building open-source communities, product-led growth, and more.
         </p>
       </div>
+      <h3>IV. Languages I Speak</h3>
+<table>
+  <tr>
+    <th>Language</th>
+    <th>Proficiency</th>
+  </tr>
+  <tr>
+    <td>Chinese</td>
+    <td>Native Speaker</td>
+  </tr>
+  <tr>
+    <td>English</td>
+    <td>IELTS score of 7. Worked in an English-speaking environment for years.</td>
+  </tr>
+  <tr>
+    <td>Japanese</td>
+    <td>Conversational proficiency for daily life.</td>
+  </tr>
+</table>
+<h3>V. Some Interesting Things</h3>
+<p>Besides programming, I also enjoy photography and design. Check some of my works:</p>
+
+<table>
+  <tr>
+    <th>Design</th>
+    <th>Photography</th>
+  </tr>
+  <tr>
+    <td>
+      Served as a designer for the <a href="https://echarts.apache.org/" target="_blank">echarts team</a> for two years. <br>View some of my design work on 
+      <a href="https://dribbble.com/ceadatian" target="_blank">Dribbble</a>
+    </td>
+    <td>
+      Check out my photography work:
+      <a href="" target="_blank"><img src="https://upload.wikimedia.org/wikipedia/commons/thumb/e/e7/Instagram_logo_2016.svg/1024px-Instagram_logo_2016.svg.png" width="20"/> @ivymidori</a>
+    </td>
+  </tr>
+</table>
       <ul className="font-sm mt-8 flex flex-col space-x-0 space-y-2 text-neutral-600 md:flex-row md:space-x-4 md:space-y-0 dark:text-neutral-300">
-        <li>
-          <a
-            className="flex items-center transition-all hover:text-neutral-800 dark:hover:text-neutral-100"
-            rel="noopener noreferrer"
-            target="_blank"
-            href="https://twitter.com/leeerob"
-          >
-            <ArrowIcon />
-            <p className="ml-2 h-7">follow me</p>
-          </a>
-        </li>
         <li>
           <a
             className="flex items-center transition-all hover:text-neutral-800 dark:hover:text-neutral-100"
@@ -351,7 +382,7 @@ export default function Page() {
             href="https://leerob.substack.com"
           >
             <ArrowIcon />
-            <p className="ml-2 h-7">get email updates</p>
+            <p className="ml-2 h-7"> Send me email</p>
           </a>
         </li>
       </ul>
