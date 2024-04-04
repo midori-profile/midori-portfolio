@@ -1,6 +1,8 @@
 import Link from 'next/link';
 import Image from 'next/image';
-import { MDXRemote } from 'next-mdx-remote/rsc';
+// https://www.npmjs.com/package/remote-mdx
+// import { MDXRemote } from 'next-mdx-remote/rsc';
+import { MDXRemote } from 'remote-mdx/rsc'
 import { TweetComponent } from './tweet';
 import { highlight } from 'sugar-high';
 import React from 'react';

@@ -10,6 +10,7 @@ import filming from "public/images/home/filming.jpg";
 import meetups from "public/images/home/meetups.jpg";
 import vercel from "public/images/home/vercel.jpg";
 import avatar from "app/avatar.jpg";
+import avatarPortfolio from "app/avatar-portfolio.jpg";
 import ViewCounter from "app/blog/view-counter";
 import { PreloadResources } from "app/preload";
 import Accordion from "./accordiont";
@@ -74,14 +75,16 @@ function ChannelLink({
                 className="h-16 w-16 rounded-full border border-neutral-200 dark:border-neutral-700"
                 priority
               />
-              <div className="relative -right-10 -top-6 inline-flex h-6 w-6 items-center rounded-full border border-neutral-200 bg-white p-1">
-                <img
-                  alt="GitHub logo"
-                  src="/github-logo.svg"
-                  width="20"
-                  height="20"
-                />
-              </div>
+              {name === "midori" && (
+                <div className="relative -right-10 -top-6 inline-flex h-6 w-6 items-center rounded-full border border-neutral-200 bg-white p-1">
+                  <img
+                    alt="GitHub logo"
+                    src="/github-logo.svg"
+                    width="20"
+                    height="20"
+                  />
+                </div>
+              )}
             </div>
           )}
           <div className="flex flex-col">
@@ -193,7 +196,7 @@ export default function Page() {
           href="https://leerob.substack.com"
         >
           <ArrowIcon />
-          <p className="ml-2 pt-0.5 h-7"> Send me email</p>
+          <p className="ml-2 pt-0.5"> Send me email</p>
         </a>
       </div>
       <div className="pt-6">
@@ -206,7 +209,11 @@ export default function Page() {
             name="@Midori"
             link="https://github.com/midori-profile"
           />
-          <ChannelLink name="Professional Experience" link="/work" />
+          <ChannelLink
+            img={avatarPortfolio}
+            name="Professional Experience"
+            link="/work"
+          />
         </div>
       </div>
       <div className="pt-6">
@@ -316,7 +323,7 @@ export default function Page() {
                   Led Team's front-end testing strategy, provided comprehensive
                   E2E test and{" "}
                   <LinkComponent href="https://www.tencentcloud.com/">
-                    Cypress automation tool
+                    Cypress automation tool.
                   </LinkComponent>
                 </p>
               </div>
@@ -361,33 +368,17 @@ export default function Page() {
         <div className="my-4 flex flex-col sm:flex-row w-full space-y-2 sm:space-x-2 sm:space-y-0 overflow-x-auto">
           <div className="flex items-center justify-between rounded border border-neutral-200 bg-neutral-50 px-3 py-4">
             <a href="https://linear.app">
-              <svg width="78" height="20" role="img" aria-label="Linear logo">
-                <use href="/sprite.svg#linear" />
-              </svg>
+            <img alt="GitHub logo" src="/Frame8.svg" width="170"/>
             </a>
           </div>
           <div className="flex items-center justify-between rounded border border-neutral-200 bg-neutral-50 px-3 py-4">
             <a href="https://supabase.com">
-              <svg
-                width="100"
-                height="19"
-                role="img"
-                aria-label="Supabase logo"
-              >
-                <use href="/sprite.svg#supabase" />
-              </svg>
+            <img alt="GitHub logo" src="/Frame7.svg" width="96"/>
             </a>
           </div>
           <div className="flex items-center justify-between rounded border border-neutral-200 bg-neutral-50 px-3 py-4">
             <a href="https://www.makeswift.com/blog/makeswift-is-joining-bigcommerce">
-              <svg
-                width="96"
-                height="19"
-                role="img"
-                aria-label="Makeswift logo"
-              >
-                <use href="/sprite.svg#makeswift" />
-              </svg>
+              <img alt="GitHub logo" src="/Frame6.svg" width="120"/>
             </a>
           </div>
         </div>
@@ -436,7 +427,7 @@ export default function Page() {
             <li>
               <span>English -- </span>
               <span>
-                IELTS score of 7. Worked in an English-speaking environment for
+                IELTS score of 7. Worked in English-speaking environments for
                 years.
               </span>
             </li>
