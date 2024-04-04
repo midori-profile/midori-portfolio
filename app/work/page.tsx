@@ -1,9 +1,10 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { LinkComponent } from "../page";
 
 export const metadata: Metadata = {
   title: "Work",
-  description: "A summary of my work and contributions.",
+  description: "A summary of my professional experience.",
 };
 
 async function Stars() {
@@ -16,119 +17,163 @@ async function Stars() {
 export default function WorkPage() {
   return (
     <section>
-      <h1 className="font-medium text-2xl mb-8 tracking-tighter">
+      <h1 className="text-2xl font-medium tracking-tighter">
         Professional Experience
       </h1>
-      <div className="prose-lg prose-neutral">
-        <p className="text-gray-500">
-          As a senior front-end engineer at{"  "}
-          <a
-            href="https://en.wikipedia.org/wiki/Tencent"
-            className="underline text-black hover:text-gray-800"
-          >
-            Tencent
-          </a>
-          {"  "}
-          and{"  "}
-          <a
-            href="https://en.wikipedia.org/wiki/Baidu"
-            className="underline text-black hover:text-gray-800"
-          >
-            Baidu
-          </a>
-          {"  "}, I've delivered engineering solutions to both internal and
-          external engineers to maximize quality and Efficiency of development
+      <div className="pt-6">
+        <p className="prose prose-neutral mb-6">
+          As a senior front-end engineer at Tencent and Baidu , I've delivered
+          engineering solutions to both internal and external engineers to
+          maximize quality and Efficiency of development.
         </p>
-        <hr className="my-6 border-neutral-100 dark:border-neutral-800" />
+        <hr className="border-neutral-100 dark:border-neutral-800" />
+      </div>
+      <div className="pt-6">
         <h2 className="font-medium text-xl mb-1 tracking-tighter">
-          （Dec. 2021 ~ Now）: Spearheading Team's Technical Architecture and
-          Toolchain{" "}
+          Current Phase: Spearheading Team's Technical Architecture and
+          Toolchain
         </h2>
-        <p className="text-neutral-600 dark:text-neutral-400 text-sm">
-          maximize quality & Efficiency of development
+        <p className="mb-4 text-neutral-600 dark:text-neutral-400 text-sm">
+          maximize quality & Efficiency of development, Dec. 2021 ~ Now
         </p>
-        <p>
-          I joined <a href="https://vercel.com/home">Vercel</a> early to grow{" "}
-          <a href="https://nextjs.org">Next.js</a> and our developer community.
-          I built our Developer Relations team to teach our community about our
-          products.
+        <p className="prose prose-neutral mb-4">
+          <span className="font-bold">
+            Monorepo & Micro Front-End Architecture:
+          </span>{" "}
+          Integrated SPA applications into one Tencent's Cloud system, supports
+          <LinkComponent href="https://en.wikipedia.org/wiki/Tencent">
+            TypeScript and Rust mixed development.
+          </LinkComponent>
         </p>
-        <ul>
-          <li>
-            In 2021, I was promoted to Director of DevRel. We{" "}
-            <a href="https://twitter.com/kelseyhightower/status/1105985400110112768">
-              translated customer pain
-            </a>{" "}
-            back into the product roadmap. We spoke at{" "}
-            <Link href="/blog/nextjs-conf-2022-recap">conferences</Link>, wrote
-            blog posts, and created videos. We built open-source examples and
-            contributed back to the product.
-          </li>
-          <li>
-            In 2022, I was promoted to VP of Developer Experience, now also
-            leading our product documentation team. My team created a{" "}
-            <a href="https://nextjs.org/learn">new free course</a> to teach
-            Next.js, which had 17 million page views that year.{" "}
-            <a href="https://twitter.com/leeerob/status/1608900031859527682">
-              I shipped.
-            </a>{" "}
-            I partnered with our open-source community, collaborating with
-            frameworks like{" "}
-            <a href="https://vercel.com/docs/frameworks/nuxt">Nuxt</a> and{" "}
-            <a href="https://astro.build/blog/vercel-official-hosting-partner/">
-              Astro
-            </a>{" "}
-            and sponsoring individuals and projects.
-          </li>
-          <li>
-            In 2023, I was promoted to VP of Product, now also leading Product
-            Management.
-          </li>
-        </ul>
-        <p>
-          Since I joined Vercel in 2020, Next.js active developers have grown
-          1000%, now at ~900k. Next.js is now a top 10 software project on
-          GitHub with <Stars />. It's used by Walmart, ChatGPT, Starbucks, Okta,
-          Datastax, Notion, and <a href="https://nextjs.org/showcase">more</a>.
+        <p className="prose prose-neutral mb-4">
+          <span className="font-bold">Engineering Efficiency: </span>Developed
+          an
+          <LinkComponent href="https://en.wikipedia.org/wiki/Tencent">
+            APImock platform supporting both GraphQL
+          </LinkComponent>
+          and RESTful for Tencent's CSIG as a full-stack engineer. <br></br>
+          Primary responsibility for team's CI/CD pipeline, facilitating
+          multi-environment deployment and PR-level E2E validation. conducted
+          multiple
+          <LinkComponent href="https://en.wikipedia.org/wiki/Tencent">
+            sharing on Kubernetes
+          </LinkComponent>
+          , Pulumi, and Helm. <br></br>
+          Provided comprehensive E2E test and{" "}
+          <LinkComponent href="https://en.wikipedia.org/wiki/Tencent">
+            cypress tool{" "}
+          </LinkComponent>
+          for the team.
         </p>
-        <hr className="my-6 border-neutral-100 dark:border-neutral-800" />
-        <h2 className="font-medium text-xl mb-1 tracking-tighter">Hy-Vee</h2>
-        <p className="text-neutral-600 dark:text-neutral-400 text-sm">
-          Senior Software Engineer, 2018 — 2020
+        <div>
+          <p className="my-0 font-bold"> Achievement：</p>
+          <div className="prose prose-neutral">
+            <ul className="list-disc list-inside">
+              <li>
+                <span>
+                  {" "}
+                  Successfully reduced project bundle size by 30% through
+                  monorepo adoption, Micro Front-End facilitating seamless
+                  collaboration across diverse domains within the Tencent Cloud
+                  Team.
+                </span>
+              </li>
+              <li>
+                <span>
+                  APImock platform reduced the manpower needed for debugging
+                  single API from 2-3 people to 1 person
+                </span>
+              </li>
+            </ul>
+          </div>
+        </div>
+        <hr className="border-neutral-100 dark:border-neutral-800" />
+      </div>
+      <div className="pt-6">
+        <h2 className="font-medium text-xl mb-1 tracking-tighter">
+          Phase II: Addressing Business System Challenges
+        </h2>
+        <p className="mb-4 text-neutral-600 dark:text-neutral-400 text-sm">
+          Leading project to address business challenges and solve system
+          issues, Jun. 2020 ~ Sep. 2021
         </p>
-        <p>
-          Hy-Vee, an almost 100-year-old grocery chain in the United States,
-          wanted to build a new version of their digital storefront. I joined a
-          team of <Link href="/blog/product-engineers">product engineers</Link>{" "}
-          working across web and mobile to rebuild their legacy .NET application
-          (~500k MAU) with React and React Native.
+        <p className="prose prose-neutral mb-4">
+          <span className="font-bold">
+            Performance Monitoring and Optimization:
+          </span>{" "}
+          Implement a complete performance monitoring system, including
+          performance monitoring, error monitoring, and risk monitoring for
+          Tencent Cloud Products(serving tens of millions of users).
         </p>
-        <p>
-          On the frontend, I led our move from a custom webpack and React
-          configuration to Next.js and the latest React patterns. In the
-          process, I shared my learnings online, helping educate members of the
-          React and Next.js community by creating courses.
+        <div>
+          <p className="my-0 font-bold"> Achievement：</p>
+          <div className="prose prose-neutral">
+            <ul className="list-disc list-inside">
+              <li>
+                <span>
+                  Designed a cross-platform SDK that supports batch event
+                  reporting in weak network and offline environments, Used
+                  JavaScript for data collection and Node.js, Koa, Kafka, Flink,
+                  Elasticsearch, and Clickhouse for data reporting, calculation,
+                  and storage.
+                </span>
+              </li>
+              <li>
+                <span>
+                  Solved performance issues such as slow start and poor runtime
+                  performance of business, resulting in a 50% reduction in
+                  startup time and a 62% reduction in first screen rendering
+                  time. Also reduced page memory consumption by 90% in extreme
+                  conditions.{" "}
+                  <LinkComponent href="https://en.wikipedia.org/wiki/Tencent">
+                    see more detils here.
+                  </LinkComponent>
+                </span>
+              </li>
+            </ul>
+          </div>
+        </div>
+        <hr className="border-neutral-100 dark:border-neutral-800" />
+      </div>
+      <div className="pt-6">
+        <h2 className="font-medium text-xl mb-1 tracking-tighter">
+          Phase I: Business Requirement Implementation
+        </h2>
+        <p className="mb-4 text-neutral-600 dark:text-neutral-400 text-sm">
+          Concentrated on individual tasks, completing them with high quality
+          and innovation, Jun. 2017 ~ Mar. 2020
         </p>
-        <p>
-          Throughout my two years, I was able to work on some hard problems:
-          decoupling a decade old monolith into microservices, working with a
-          federated GraphQL API, learning and occasionally managing a Kubernetes
-          cluster, building and implementing a design system, incrementally
-          migrating individual components and routes to a new framework and
-          infrastructure, and more.
+        <p className="prose prose-neutral mb-4">
+          <span className="font-bold">Baidu Mini-App framework: </span> Leading
+          technical innovations obtained 2 technical patents in Baidu. <br></br>
+          including an innovative transparent video animation solution using
+          webGL, video, and canvas that converts video files into transparent
+          channel-supported animations.<br></br> Design and develop the
+          same-layer rendering solution that allows native and HTML5 components
+          to overlap and interact with each other.
         </p>
-        <hr className="my-6 border-neutral-100 dark:border-neutral-800" />
-        <h2 className="font-medium text-xl mb-1 tracking-tighter">Workiva</h2>
-        <p className="text-neutral-600 dark:text-neutral-400 text-sm">
-          Software Engineer, 2015 — 2018
-        </p>
-        <p>
-          Workiva ($WK) is a cloud platform for data reporting and compliance.
-          During my time at Workiva, I gained my first production experience
-          using React. I worked on tooling to help predict and alert and
-          regressions in our SaaS platform, building a product similar to
-          open-source tools like Sentry.
-        </p>
+        <div>
+          <p className="my-0 font-bold"> Achievement：</p>
+          <div className="prose prose-neutral">
+            <ul className="list-disc list-inside">
+              <li>
+                <span>
+                  Dramatically cut the cost of implementing complex animations
+                  to zero and shrunk animation resource sizes by 90% compared to
+                  PNG sequences. Enhanced Baidu APP products, influencing
+                  billions of page views.
+                </span>
+              </li>
+              <li>
+                <span>
+                  Enabled 300k mini-program developers to seamlessly integrate
+                  native and web components, greatly enhancing usability and
+                  developer experience.
+                </span>
+              </li>
+            </ul>
+          </div>
+        </div>
       </div>
     </section>
   );

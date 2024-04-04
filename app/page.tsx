@@ -29,7 +29,7 @@ function Badge(props) {
   );
 }
 
-function ArrowIcon() {
+export function ArrowIcon() {
   return (
     <svg
       width="12"
@@ -106,7 +106,7 @@ function ChannelLink({
 async function getMidoriFollowers() {
   // FIXME: {"message":"API rate limit exceeded for 185.212.61.32. (But here's the good news: Authenticated requests get a higher rate limit. Check out the documentation for more details.)","documentation_url":"https://docs.github.com/rest/overview/resources-in-the-rest-api#rate-limiting"}
   const response = await fetch("https://api.github.com/users/midori-profile");
-  console.log('response: ', response);
+  console.log("response: ", response);
   const data = await response.json();
   return data.followers;
 }
@@ -117,7 +117,7 @@ async function Subs({ name }: { name: string }) {
   if (name === "@Midori") {
     // Replace this with the actual function to get @Midori's followers
     counts = await getMidoriFollowers();
-    console.log('counts: ', counts);
+    console.log("counts: ", counts);
   } else if (name === "Professional Experience") {
     // Replace this with the actual function to get the total article views
     // counts = await getTotalArticleViews();
@@ -166,7 +166,10 @@ interface LinkComponentProps {
   children: React.ReactNode;
 }
 
-const LinkComponent: React.FC<LinkComponentProps> = ({ href, children }) => (
+export const LinkComponent: React.FC<LinkComponentProps> = ({
+  href,
+  children,
+}) => (
   <span>
     {" "}
     <a href={href} className="underline text-black hover:text-gray-800">
@@ -179,9 +182,20 @@ export default function Page() {
   return (
     <section>
       <PreloadResources />
-      <h1 className="text-2xl font-medium tracking-tighter">
-        Hi 👋, I'm Midori.{" "}
-      </h1>
+      <div className="flex flex-col sm:flex-row w-full items-end sm:items-center">
+        <h1 className="text-2xl font-medium tracking-tighter">
+          Hi 👋, I'm Midori.{" "}
+        </h1>
+        <a
+          className="ml-6 flex items-center transition-all hover:text-neutral-800 dark:hover:text-neutral-100"
+          rel="noopener noreferrer"
+          target="_blank"
+          href="https://leerob.substack.com"
+        >
+          <ArrowIcon />
+          <p className="ml-2 pt-0.5 h-7"> Send me email</p>
+        </a>
+      </div>
       <div className="pt-6">
         <p className="prose prose-neutral">
           {`A passionate full stack developer currently living in 🇯🇵 Tokyo, Japan. I am well-adapted to remote work cultures, Feel free to explore my projects on Github or my Portfolio:`}
@@ -432,33 +446,6 @@ export default function Page() {
             </li>
           </ul>
         </div>
-        {/* <table className="prose prose-neutral my-4 min-w-full overflow-hidden text-left rounded border border-neutral-200">
-          <thead className="bg-neutral-50 rounded w-full">
-            <tr>
-              <th className="px-3 py-4">Language</th>
-              <th className="prose prose-neutral px-3 py-4">Proficiency</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr className="border border-neutral-200 bg-white">
-              <td className="px-3 py-4">Chinese</td>
-              <td className="px-3 py-4">Native Speaker</td>
-            </tr>
-            <tr className="bg-white border-b dark:bg-gray-800 dark:border-gray-700">
-              <td className="px-3 py-4">English</td>
-              <td className="px-3 py-4">
-                IELTS score of 7. Worked in an English-speaking environment for
-                years.
-              </td>
-            </tr>
-            <tr className="bg-white dark:bg-gray-800">
-              <td className="px-3 py-4">Japanese</td>
-              <td className="px-3 py-4">
-                Conversational proficiency for daily life.
-              </td>
-            </tr>
-          </tbody>
-        </table> */}
       </div>
       <div className="pt-6">
         <h2 className="font-medium text-xl mb-1 tracking-tighter">
@@ -499,15 +486,6 @@ export default function Page() {
         </ul>
       </div>
       {/* put it into guest book */}
-      {/* <a
-        className="flex items-center transition-all hover:text-neutral-800 dark:hover:text-neutral-100"
-        rel="noopener noreferrer"
-        target="_blank"
-        href="https://leerob.substack.com"
-      >
-        <ArrowIcon />
-        <p className="ml-2 h-7"> Send me email</p>
-      </a> */}
     </section>
   );
 }

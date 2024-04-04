@@ -38,7 +38,7 @@ function SubmitButton() {
       disabled={pending}
       type="submit"
     >
-      Sign
+      Send
     </button>
   );
 }
