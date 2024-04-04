@@ -104,7 +104,9 @@ function ChannelLink({
 }
 
 async function getMidoriFollowers() {
+  // FIXME: {"message":"API rate limit exceeded for 185.212.61.32. (But here's the good news: Authenticated requests get a higher rate limit. Check out the documentation for more details.)","documentation_url":"https://docs.github.com/rest/overview/resources-in-the-rest-api#rate-limiting"}
   const response = await fetch("https://api.github.com/users/midori-profile");
+  console.log('response: ', response);
   const data = await response.json();
   return data.followers;
 }
@@ -115,6 +117,7 @@ async function Subs({ name }: { name: string }) {
   if (name === "@Midori") {
     // Replace this with the actual function to get @Midori's followers
     counts = await getMidoriFollowers();
+    console.log('counts: ', counts);
   } else if (name === "Professional Experience") {
     // Replace this with the actual function to get the total article views
     // counts = await getTotalArticleViews();
