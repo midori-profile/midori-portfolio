@@ -4,389 +4,218 @@ publishedAt: '2023-10-28'
 summary: 'Understand the resources in k8s and how to manipulate them'
 ---
 ## Background:
-For many who are new to CI/CD and starting with GitHub 
-Actions, the most significant challenge is quickly understanding 
-the variety of resources and concepts within Kubernetes (k8s). 
-What are deployments, ingress? 
-What's the difference between a container and a container image? 
-These concepts may initially seem daunting.
+
+For many who are new to CI/CD and starting with GitHub Actions, the most significant challenge is quickly understanding the variety of resources and concepts within Kubernetes (k8s). 
+
+Questions like "What are deployments, ingress?" and "What's the difference between a container and a container image?" may initially seem daunting.
 
 This presentation is beginner-friendly! I will explain everything in the simplest terms or metaphor to ensure it's easy to understand. Let's dive in.
 
-## The concept of Kubernetes (k8s) & its overall architecture.
+## I. The concept of Kubernetes (k8s) & its overall architecture.
 
-Use one sentence to summarize :It's a system for automating the deployment, scaling, and management of containerized apps.
+**Use one sentence to summarize:** 
+> It's a system for automating the deployment, scaling, and management of containerized apps.
 
 but, what does that really mean?
 
-Picture this: you've got a bunch of apps or services that need to run, and they often need attention—like starting, stopping, or updating. You don't want to do this manually every single time, right?
+Picture this: 
+
+you've got a bunch of apps or services that need to run, and they often need attention—like starting, stopping, or updating. You don't want to do this manually every single time, right?
 
 This is where Kubernetes really shines! You can think of it as an automated army of robots to manage your applications.
 
+
 ### I will briefly introduce the basic concept of Kubernetes (k8s) first:
 
-The most fundamental concept in k8s is the container. 
-Simply put:  a container is like a lightweight, encapsulated software package that contains everything needed to run an application: code, runtime environment, libraries, and even system settings. It's like packing your application into a portable box that can run anywhere.
+#### The most fundamental concept:
+
+In k8s is the **container**. Simply put, a container is like a lightweight, encapsulated software package that contains everything needed to run an application: code, runtime environment, libraries, and even system settings. 
+It's like packing your application into a portable box that can run anywhere.
+
 Then, k8s comes in to manage these boxes. It ensures that the containers run in the right places and automatically adjusts their numbers as needed (this is what is called scaling). For instance, if the number of users of your application suddenly increases, k8s can automatically strengthen support by adding more containers to share the load. Conversely, if the number of users decreases, it will reduce the number of containers accordingly.
 
-### then, The core architecture of k8s can be divided into several parts:
+#### Core Architecture of K8s:
 
-1. **Master Node**(a node refers to a virtual machine.): This is the brain of the entire k8s system. It decides where the containers should run and when to scale them…
-2. **Worker Node**: These are the nodes that do the actual work, running your containers. They are managed by the Master node. worker node carry Pods.
-3. **container**： This is the smallest unit in k8s. it's simplest running unit of an application
-4. **Pod**：You can think of it as a home for containers. Usually, a Pod runs a single container, but sometimes multiple closely related containers may share a Pod.
-5. **Ingress**：Ingress is an API object that manages the rules for external access to your applications, such as routing HTTP traffic.
-6. **Service**：This defines how a group of Pods can be accessed. It allows  users to find and connect to the right Pods.  it provides Pods with a fixed IP address and DNS name, even if the location of the Pods changes.
+1. **Master Node**: The brain of the entire k8s system. It decides where the containers should run and when to scale them.
+2. **Worker Node**: These nodes do the actual work, running your containers. They carry Pods.
+3. **Container**: The smallest unit in k8s, the simplest running unit of an application.
+4. **Pod**: Think of it as a home for containers. Usually, a Pod runs a single container, but sometimes, closely related containers may share a Pod.
+5. **Ingress**: Manages the rules for external access to your applications, such as routing HTTP traffic.
+6. **Service**: Defines how a group of Pods can be accessed. It provides Pods with a fixed IP address and DNS name.
+> **Difference between Ingress and Service**
+> - Ingress is like a public highway leading into a neighborhood. It manages and directs external traffic coming from outside the cluster to the appropriate Services within the cluster.
+> - Service is like the internal GPS mapping service. It ensures that anyone who wants to visit a house (Pod) can find it easily, even if the house moves locations.
+7. **Deployment**: Helps you manage Pods and ensures that the specified number of Pods are always running.
 
-Difference between ingress and service：
-
-If we compare pods to houses.， Ingress is like public highway leading into a neighborhood. It manages and directs external traffic coming from outside the cluster (like from the internet) to the appropriate Services within the cluster
-a set of node machines for running containerized applications
-
-Service is like the internal GPS mapping service. It ensures that anyone who wants to visit a house (Pod) can find it easily, even if the house moves locations.
-
-7. **Deployment**：This helps you manage Pods and ensures that the specified number of Pods are always running. For example, if a Pod fails, Deployment will automatically create a new Pod to replace it.
 
 These components work together to enable Kubernetes
 
-If you find it difficult to grasp so many concepts all at once, never mind. you will quickly understand them in the practical(third) part.
+If you find it difficult to grasp so many concepts all at once, never mind. you will quickly understand them in the （Using kubectl to Operate Resources and View These Resources in Rancher）(third) part.
 
-## Understanding Common Kubernetes Resources
+## II. Understanding Common Kubernetes Resources
 
 now, we'll introduce common Kubernetes resources. Understanding these will prevent you from feeling lost when writing most CI jobs, as the resources you'll encounter in work mostly fall within this scope.
 
-If you find the concepts too many and confusing, you can look at this diagram.
- 'Container' is the smallest unit of an application
- 'workload' refers to the collection of applications running on the cluster.
- 'Networking' relates to handling network traffic
- 'storage' refers to data storage
- 'config' means configuration
 
- Container and Container Image （cookie mould and cookie）
-**Container Image:** A self-contained package with all software components to run in a container.
+### Containers and Pods
 
-**Container:** An **instance** of an image that runs as an isolated process.
+- **Container**: The smallest deployable unit in a Kubernetes application, similar to a single process in a traditional operating system.
+    - **Container Image**: A self-contained package that includes everything needed to run a container, analogous to a class in programming.
+    - **Container Instance**: The running version of a container image, similar to an instance of a class.
 
-their relationship is a bit like **class** and **instance** in programing
+- **Pod**: A group of one or more containers, with shared storage/network, and a specification on how to run the containers. Think of a Pod as a home for containers, akin to a process group in an operating system.
 
-pod
+> **Pods Key Points**:
+> - Containers within a Pod share the same IP address and can communicate using `localhost`.
+> - Kubernetes can automatically manage the lifecycle of Pods, restarting or replacing them as necessary.
 
-A **Pod** —- house of containers. 
+### ReplicaSet
 
-Kubernetes can be seen as an operating system for the cloud
+A ReplicaSet ensures a specified number of pod replicas are running at any given time, aiding in application scaling and fault tolerance.
 
-It's like a group of threads or processes in an operating system that work together on a task. They share networking and storage resources, forming a"`process group` or `thread group` to finish tasks.
+> **How a ReplicaSet Works**:
+> - Defined by a **Selector**, **Number of Replicas**, and a **Pod Template**.
+> - Acts like a manager, maintaining the desired state of pod replicas.
 
-**Pod diagram**
+### Deployment
 
-A multi-container Pod that contains a file puller and a web server,  uses a persistent volume for shared storage between the containers.
+Deployments manage the deployment and scaling of a set of Pods, and provide declarative updates to Pods and ReplicaSets.
 
-I will explain volume later
+> **Core Concepts of Deployment**:
+> - **Declarative Updates**: You define the desired state, and Kubernetes makes it happen.
+> - **Rollouts and Rollbacks**: Automate updates and rollbacks, maintaining application availability.
+> - **Scalability**: Easily scale applications up or down based on demand.
 
-Key points to remember about Pods:
+### Job and CronJob
 
-- Containers in one Pod share the same IP address and port space, so they can  communicate with each other using **`localhost`**.
-- Kubernetes can automatically restart or replace a Pod if any of its containers fail.
+- **Job**: Executes tasks that terminate upon completion, like batch jobs or data processing tasks.
+- **CronJob**: Schedules tasks to run at specified times, useful for periodic tasks like backups or sending emails.
 
-replicaset
+### Networking: Ingress and Service
 
-A ReplicaSet in Kubernetes ensures a specified number of identical Pods are always running. 
+- **Ingress**: Manages external access to your services, acting as a router or HTTP proxy.
+- **Service**: Provides a consistent way to access a group of Pods, serving as internal load balancers.
 
-It helps ensure that there are enough instances at any given time to handle the load of the application.
+> **Service vs. Ingress**:
+> - **Ingress** is like a public highway into your application, directing incoming traffic.
+> - **Service** is like an internal GPS, ensuring connections find their way to the right Pods.
 
-### **How a ReplicaSet works[](https://kubernetes.io/docs/concepts/workloads/controllers/replicaset/#how-a-replicaset-works)**
+### Storage: Volume and Secrets
 
-A ReplicaSet is defined with three factors 
+- **Volume**: Allows data to persist and be shared between containers in a Pod, separating data lifecycle from container lifecycle.
+- **Secrets**: Manages sensitive information, providing a secure way to store and access passwords, tokens, and keys.
 
-- **Selector**: This is a rule that tells the ReplicaSet which Pods to manage
-- **Number of Replicas**: This tells the ReplicaSet how many identical Pods you want it to maintain.
-- **Pod Template**: This is a blueprint that instructs the ReplicaSet on what a new Pod should look like if it needs to create one to meet the replica count requirement.
 
-Once a ReplicaSet is defined, it creates or deletes Pods. If more Pods are needed, it creates new ones based on the Pod template you provided.
+## III. Getting started right now → Using kubectl to Operate Resources and View These Resources in Rancher
 
-If I were to give an analogy: the ReplicaSet acts like a manager, ensuring that the specific number of Pods you want is always running, not more, not less.
+基于你的要求，以下是经过格式化处理的 Markdown 文档，其中包含了代码段和其他元素的清晰展示：
 
-deployment
+```markdown
+## Getting Started with `kubectl` and Rancher
 
-A Deployment provides declarative updates for Pods and ReplicaSets. it’s like a blueprint in cluster. Deployment will be the concept you deal with the most
+### Introduction
 
-**Core Concepts**
+- **kubectl**: The command-line tool that lets you control Kubernetes clusters.
+- **Rancher**: An open-source platform for managing Kubernetes, offering a UI for Kubernetes (k8s) environments.
 
-1. **Declarative Pod and ReplicaSet Updates**:
-- Deployments allow you to define the desired state of Pods and ReplicaSets in a configuration file (YAML). This includes a range of specified parameters and configurations, such as the number of Pod replicas, container images, update strategies, and more.
-- The Deployment Controller then changes the actual state to match this desired state
+> **Note**: Although Rancher provides a convenient UI, mastering `kubectl` is crucial for direct cluster management and debugging. Sometimes, Rancher might not display all the necessary information for troubleshooting.
 
-The Deployment Controller is a component in Kubernetes usally running on master node
+### Connecting to a Kubernetes Playground with `kubectl`
 
-1. **Automated Rollouts and Rollbacks**: Deployments automate the process of updating Pods. 
-    - When you make changes to the Deployment configuration, Kubernetes automatically rolls out these changes incrementally while ensuring a specified number of Pods are running.
-    - If something goes wrong, Kubernetes can automatically roll back to the previous configuration. We often encounter this scenario when writing CI.
+A "Playground" refers to a Kubernetes environment set up for learning and testing. It allows users to experiment with Kubernetes features without affecting production environments.
 
-    2. **State Tracking**: Deployment status, such as the number of running replicas and update status, can be monitored via the Kubernetes API.
-3. **Self-healing**: Deployments provide self-healing by replacing Pods that fail, become unresponsive, or do not meet the user-defined health check.
-4. **Scalability**: Deployments make it easy to scale up or down the number of Pods as required. You can change the number of replicas in the Deployment configuration, and Kubernetes will adjust the number of Pods to match.
+1. Download your `kubeconfig` file from [Rancher Monitoring](https://rancher.unext.dev/c/c-7wgx6/monitoring) and save it to `~/.kube/config`. This configures `kubectl` to interact with your cluster.
 
-job and cronjob
+### Basic `kubectl` Commands
 
-Job and CronJob are resource types used for task execution in Kubernetes. Their core concepts are:
+- To view all resources in your namespace (Deployments, Services, Pods, etc.):
 
-1. **Job**:
-    - A Job is responsible for creating a Pod to execute one or more tasks until a certain number of successful completions.
-    - Its primary purpose is to execute tasks that need to be terminated, such as batch jobs and data processing tasks.
-    - Once the task is complete, the Job stops the Pod from running but does not delete the Pods. This allows you to check the Pod logs and status to understand how the Job performed.
-    - Jobs are suitable for tasks that need to be executed only once.
-2. **CronJob**:
-    - A CronJob is a type of Job that executes tasks at scheduled times.
-    - It is suitable for tasks that need to be performed periodically, such as cleanups and sending email reports.
+    ```bash
+    kubectl get all -n webfront
+    ```
 
-    ingress
+- To view all pods in your namespace:
 
-    highway: manages the rules for **external access** to your cluster
+    ```bash
+    kubectl get pods -n webfront
+    ```
 
-Here is a simple example where an Ingress sends all its traffic to one Service:
+### Understanding Pod Information
 
-the downstream of Ingress is Service.
+Example output:
 
-core concept: 
-
-**Traffic Routing**: It allows you to define rules for routing HTTP and HTTPS traffic to specific services based on hostnames or paths.
-
-**Host and Path-Based Routing**: Ingress can route traffic based on hostnames (like **`www.example.com`**) and paths (like **`/app1`**, **`/app2`**). This means different requests to the same IP can be served by different services based on their URLs.
-Our previous multiple environment deployment (multiple-env-deployment) was able to use the same domain name to point to different services by switching the Ingress.）
-**Load Balancing**: It provides load balancing, Ingress helps distribute incoming network traffic efficiently across multiple backend services.
-
-
-service
-
-**official defination**：In Kubernetes, a Service is a method for exposing a network application that is running as one or more [Pods](https://kubernetes.io/docs/concepts/workloads/pods/) in your cluster.
-
-**metaphor**: Internal GPS mapping service. It ensures that anyone who wants to visit a house (Pod) can find it easily
-
-**Why do we need service** ?
-
-If you use a [Deployment](https://kubernetes.io/docs/concepts/workloads/controllers/deployment/) to run your app, that Deployment can create and destroy Pods dynamically. From one moment to the next
-
-you don't know how many of those Pods are working and healthy; you might not even know what those healthy Pods are named. 
-
-Each Pod gets its own IP address. For a given Deployment in your cluster, the set of Pods running in one moment in time could be different from the set of Pods running that application a moment later.
-
-This leads to a problem: if some set of Pods (call them "backends") provides functionality to other Pods (call them "frontends") inside your cluster, how do the frontends find out and keep track of which IP address to connect to, so that the frontend can use the backend part of the workload?
-
-The Service help you expose groups of Pods over a network. Each Service object defines a virtual IP
-
-Service IP Address (Cluster IP): When each Service is created, it is assigned a unique Cluster IP address. This IP address is a virtual address and is not directly associated with any individual Pod
-Pod IP Address: In Kubernetes, each running Pod has a unique IP address used for actual network communication.
-Port Mapping:  When a request arrives at the Service's Cluster IP address and port, the Kubernetes control plane routes the request to a set of real Pod IP addresses . This process includes load balancing and request routing to ensure the request is correctly delivered to the target Pod.
-
-volumn
-
-Volumes provide a way to separate data storage from the container lifecycle, allowing containers to still access their data when they are restarted, rescheduled, or migrated
-
-The most common type of Kubernetes Volume are:
-
-PersistentVolume (PV)
-
-you can use persistent volume to store your data on remote storage devices accessible over a network, rather than on local hard drives
-
-Secret (K8s Password Management)
-
-Secrets are used for managing and storing sensitive information, such as passwords, OAuth tokens, SSH keys. They prevent sensitive data from being stored in plain text within the Pod spec.
-
-Kubernetes uses Secrets in two ways:
-
-1. **As Environment Variables**:
-- Data in Secrets can be passed as environment variables to containers within Pods. This allows containers to access sensitive data at runtime without hard-coding it in application code or Docker images.
-- You can specify individual environment variables for each container in a Pod, referencing the data stored in Secrets.
-1. **As Volume Mounts**:
-- Secrets can also be mounted as volumes into the Pod's file system. With this approach, data from Secrets is written into one or more files, which are then mounted at a specified path within the Pod.
-- This method is particularly useful for applications that need to read configuration or keys from files, such as configuration files or certificates.
-
-
-
-
-
-
-
-## Getting started right now → Using kubectl to Operate Resources and View These Resources in Rancher
-
-
-**kubectl**： the command-line tool that lets you control Kubernetes clusters.
-
-**rancher**:  `rancher`is an open-source platform for managing Kubernetes, offering a UI for Kubernetes (k8s) environments. 
-
-👿 but you still should learn **kubectl,** because rancher is hard to use, Sometimes you want to debug, but the information is not visible on Rancher!!! I have come to this conclusion through many painful experiences.
-
-Follow command to run through and you will have a deep understanding of kubectl and rancher
-
-Connect to a remote Kubernetes Playground (webfront) using kubectl:
-
-A "Playground" typically refers to a Kubernetes environment for experimentation and learning. Here, users can practice and test various Kubernetes features and configurations without affecting a production environment.
-
-Go to https://rancher.unext.dev/c/c-7wgx6/monitoring. Download your `kubeconfig` file from the top right corner of the page.
-
-Then, store it in `~/.kube/config` in your home directory.a configuration file that sets up access, enabling kubectl  to interact with the cluster.
-
-1. Let’s start with the basics – see everything in your namespace, like all your Deployments, Services, and Pods? 
-
-```bash
-kubectl get all -n webfront
-```
-
-1. if you think it’s too much and you just want to see all the pods
-
-```jsx
-kubectl get pods -n webfront
-```
-
+```plaintext
 u-github-runner-webfront-docker-5ddf45d5f6-nbvxk 1/1 Running 0 148m
-
-```yaml
-1/1: This represents the current number of replicas of the Pod. In this example
-
-Running: This indicates the Pod's status.
-
-0: This is the current restart count of the Pod. If the container fails and restarts, this count would increase.
-
-148m: This is the duration of time the Pod has been running. In this example, it's 148 minutes.
 ```
 
-let's dive into how to use `kubectl` to create a stateless application, the application has this features: 
+Explanation:
 
-- Run five instances of a Hello World application. which will print ‘hello world’
-- Create a Service object that exposes an external IP address. Use the Service object to access the running application.
+- `1/1`: The number of replicas.
+- `Running`: The Pod's status.
+- `0`: The current restart count.
+- `148m`: The duration the Pod has been running.
 
-create deployment
+### Deploying a Stateless Application
 
-# load-balancer-example.yaml
-# Define API version and resource type
-apiVersion: apps/v1
-kind: Deployment
+- **Objective**: Run five instances of a "Hello World" application and expose it externally.
 
-# Metadata section, including labels and resource name
-metadata:
-  labels:
-    app.kubernetes.io/name: load-balancer-example  # Define the application label
-  name: hello-world  # Define the name of the Deployment resource
+1. Create a deployment with the following YAML (`load-balancer-example.yaml`):
 
-# Deployment specification, including replica count and selector
-spec:
-  replicas: 5  # Define the number of Pod replicas to create
-  selector:
-    matchLabels:
-      app.kubernetes.io/name: load-balancer-example  # Selector to match Pods
-
-  # Pod template section, including labels and container definition
-  template:
+    ```yaml
+    apiVersion: apps/v1
+    kind: Deployment
     metadata:
       labels:
-        app.kubernetes.io/name: load-balancer-example  # Define the Pod label
-
-    # Container definition, including image, container name, and port configuration
+        app.kubernetes.io/name: load-balancer-example
+      name: hello-world
     spec:
-      containers:
-      - image: gcr.io/google-samples/node-hello:1.0  # Container image to use
-        name: hello-world  # Define the name of the container
-        ports:
-        - containerPort: 8080  # Port that the container listens on
+      replicas: 5
+      selector:
+        matchLabels:
+          app.kubernetes.io/name: load-balancer-example
+      template:
+        metadata:
+          labels:
+            app.kubernetes.io/name: load-balancer-example
+        spec:
+          containers:
+          - image: gcr.io/google-samples/node-hello:1.0
+            name: hello-world
+            ports:
+            - containerPort: 8080
+    ```
 
-        kubectl apply -f load-balancer-example.yaml -n webfront
+    Apply the deployment:
 
-        The preceding command creates a Deployment and an associated ReplicaSet. The ReplicaSet has five Pods each of which runs the Hello World application.
+    ```bash
+    kubectl apply -f load-balancer-example.yaml -n webfront
+    ```
 
-        Display information about the Deployment:
+2. Expose the deployment:
 
-        kubectl describe deployments hello-world -n webfront
+    ```bash
+    kubectl expose deployment hello-world --type=LoadBalancer --name=hello-world-service -n webfront
+    ```
 
-        Name:                   hello-world
-Namespace:              webfront
-CreationTimestamp:      Fri, 17 Nov 2023 12:40:21 +0800
-Labels:                 app.kubernetes.io/name=load-balancer-example
-Annotations:            deployment.kubernetes.io/revision: 1
-Selector:               app.kubernetes.io/name=load-balancer-example
-Replicas:               5 desired | 5 updated | 5 total | 4 available | 1 unavailable
-StrategyType:           RollingUpdate
-MinReadySeconds:        0
-RollingUpdateStrategy:  25% max unavailable, 25% max surge
-Pod Template:
-  Labels:  app.kubernetes.io/name=load-balancer-example
-  Containers:
-   hello-world:
-    Image:        gcr.io/google-samples/node-hello:1.0
-    Port:         8080/TCP
-    Host Port:    0/TCP
-    Environment:  <none>
-    Mounts:       <none>
-  Volumes:        <none>
-Conditions:
-  Type           Status  Reason
-  ----           ------  ------
-  Available      True    MinimumReplicasAvailable
-  Progressing    True    ReplicaSetUpdated
-OldReplicaSets:  <none>
-NewReplicaSet:   hello-world-6df5659cb7 (5/5 replicas created)
-Events:
-  Type    Reason             Age   From                   Message
-  ----    ------             ----  ----                   -------
-  Normal  ScalingReplicaSet  35s   deployment-controller  Scaled up replica set hello-world-6df5659cb7 to 5
+3. View the service:
 
-  Display information about your ReplicaSet objects:
+    ```bash
+    kubectl get services hello-world-service -n webfront
+    ```
 
+    Output example:
 
-kubectl describe replicasets hello-world -n webfront
+    ```plaintext
+    NAME                  TYPE           CLUSTER-IP     EXTERNAL-IP      PORT(S)          AGE
+    hello-world-service   LoadBalancer   10.96.57.137   10.231.201.240   8080:30555/TCP   24s
+    ```
 
-Name:           hello-world-6df5659cb7
-Namespace:      webfront
-Selector:       app.kubernetes.io/name=load-balancer-example,pod-template-hash=6df5659cb7
-Labels:         app.kubernetes.io/name=load-balancer-example
-                pod-template-hash=6df5659cb7
-Annotations:    deployment.kubernetes.io/desired-replicas: 5
-                deployment.kubernetes.io/max-replicas: 7
-                deployment.kubernetes.io/revision: 1
-Controlled By:  Deployment/hello-world
-Replicas:       5 current / 5 desired
-Pods Status:    5 Running / 0 Waiting / 0 Succeeded / 0 Failed
-Pod Template:
-  Labels:  app.kubernetes.io/name=load-balancer-example
-           pod-template-hash=6df5659cb7
-  Containers:
-   hello-world:
-    Image:        gcr.io/google-samples/node-hello:1.0
-    Port:         8080/TCP
-    Host Port:    0/TCP
-    Environment:  <none>
-    Mounts:       <none>
-  Volumes:        <none>
-Events:
-  Type    Reason            Age   From                   Message
-  ----    ------            ----  ----                   -------
-  Normal  SuccessfulCreate  88s   replicaset-controller  Created pod: hello-world-6df5659cb7-gd7vn
-  Normal  SuccessfulCreate  88s   replicaset-controller  Created pod: hello-world-6df5659cb7-2vclw
-  Normal  SuccessfulCreate  88s   replicaset-controller  Created pod: hello-world-6df5659cb7-r77wj
-  Normal  SuccessfulCreate  88s   replicaset-controller  Created pod: hello-world-6df5659cb7-g7mvk
-  Normal  SuccessfulCreate  88s   replicaset-controller  Created pod: hello-world-6df5659cb7-2bdcr
+4. Access the application:
 
-  now the application is running on the cluster, but how can we access it ? 
+    ```bash
+    curl http://10.231.201.240:8080
+    ```
 
-Create a Service object that exposes the deployment:
+    Successful response: A "hello message".
 
-kubectl expose deployment hello-world --type=LoadBalancer --name=hello-world-service -n webfront
-
-Display information about the Service:
-
-kubectl get services hello-world-service -n webfront
-
-//The output is similar to:
-NAME                  TYPE           CLUSTER-IP     EXTERNAL-IP      PORT(S)          AGE
-hello-world-service   LoadBalancer   10.96.57.137   10.231.201.240   8080:30555/TCP   24s
-
-Make a note of the external IP address (`LoadBalancer Ingress`) exposed by your service. In this example, the external IP address is 10.231.201.240 Also note the value of `Port` and `NodePort`. In this example, the `Port` is 8080 and the `NodePort` is 30555.
-
-now you can run your application
-
-Use the external IP address (`LoadBalancer Ingress`) to access the Hello World application:
-
-`curl http://10.231.201.240:8080`
-
-The response to a successful request is a hello message:
-
-🎉 you successfully deploy your first application!!!
+🎉 Congratulations! You've successfully deployed your first application using `kubectl`.
