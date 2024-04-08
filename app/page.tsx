@@ -75,7 +75,7 @@ function ChannelLink({
                 className="h-16 w-16 rounded-full border border-neutral-200 dark:border-neutral-700"
                 priority
               />
-              {name === "midori" && (
+              {name === "@Midori" && (
                 <div className="relative -right-10 -top-6 inline-flex h-6 w-6 items-center rounded-full border border-neutral-200 bg-white p-1">
                   <img
                     alt="GitHub logo"
@@ -367,18 +367,27 @@ export default function Page() {
         </p>
         <div className="my-4 flex flex-col sm:flex-row w-full space-y-2 sm:space-x-2 sm:space-y-0 overflow-x-auto">
           <div className="flex items-center justify-between rounded border border-neutral-200 bg-neutral-50 px-3 py-4">
-            <a href="https://linear.app">
-            <img alt="GitHub logo" src="/Frame8.svg" width="170"/>
+            <a href="https://www.makeswift.com/blog/makeswift-is-joining-bigcommerce">
+              <img alt="GitHub logo" src="/Frame6.svg" width="120" />
             </a>
           </div>
           <div className="flex items-center justify-between rounded border border-neutral-200 bg-neutral-50 px-3 py-4">
             <a href="https://supabase.com">
-            <img alt="GitHub logo" src="/Frame7.svg" width="96"/>
+              <img alt="GitHub logo" src="/Frame7.svg" width="100" />
             </a>
           </div>
           <div className="flex items-center justify-between rounded border border-neutral-200 bg-neutral-50 px-3 py-4">
+            <a href="https://linear.app">
+              <img alt="GitHub logo" src="/Frame8.svg" width="170" />
+            </a>
+          </div>
+         <div className="flex items-center justify-between rounded border border-neutral-200 bg-neutral-50 px-3 py-4">
             <a href="https://www.makeswift.com/blog/makeswift-is-joining-bigcommerce">
-              <img alt="GitHub logo" src="/Frame6.svg" width="120"/>
+              <img
+                alt="GitHub logo"
+                src="/Frame13.svg"
+                width="120"
+              />
             </a>
           </div>
         </div>
