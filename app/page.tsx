@@ -407,11 +407,18 @@ export default function Page() {
             slug="developer-experience-examples"
           />
           <BlogLink
-            name="What Makes A Great Developer Experience?"
-            subName={"cross-platform development, and browser."}
-            slug="developer-experience-examples"
+            name="Mastering CI/CD: A Beginner’s Guide to K8s Resource Management"
+            subName={"Understand k8s and deploy your own application."}
+            slug="beginner-guide-k8s"
           />
           <BlogLink
+            name="What Makes A Great Developer Experience?"
+            subName={
+              "cross-platform development, and browser.platform development"
+            }
+            slug="developer-experience-examples"
+          />
+                    <BlogLink
             name="What Makes A Great Developer Experience?"
             subName={
               "cross-platform development, and browser.platform development"
