@@ -1,0 +1,731 @@
+---
+title: "Tencent Cloud Mini-App Performance Optimization Practices - How to Reduce Startup Time by 60%"
+publishedAt: '2023-10-28'
+summary: ''
+---
+
+##  Introduction
+
+The Tencent Cloud Medical business is a comprehensive cloud-based medical service platform designed for doctors and patients, Its main carrier is the WeChat mini program, aiming to make better use of [WeChat's](https://en.wikipedia.org/wiki/WeChat) traffic. By using WeChat mini programs as the primary platform, we can enhance the user experience and facilitate better communication between doctors and patients.
+
+<Image
+  alt={`Website`}
+  src={`/images/performance/performance-1.jpg`}
+  width={800}
+  height={200}
+/>
+
+With the continuous growth of doctors and patients, and the expanding range of service scenarios, we process millions of messages between doctors and patients daily, which poses increasing challenges to the performance of WeChat mini-programs. 
+
+As a result, we have undertaken a comprehensive optimization of Tencent Cloud's medical doctor-patient system. This optimization enhances **loading speed**, **rendering efficiency**, and other aspects to maximize the program's performance potential and improve the overall user experience.
+
+## Current problem
+
+Currently, we are facing two significant problems:
+
+<Image
+  alt={`Website`}
+  src={`/images/performance/performance-2.jpg`}
+  width={800}
+  height={200}
+/>
+
+1. **Slow loading time:** The cloud medical homepage, which serves as the core entry point has a slow loading time. The first screen has many requests, and the entire initial cold start time exceeds 5s in most devices. This loading time negatively impacts the user arrival rate of the small program. According to research in High Performance iOS Apps, 25% of users abandon an app if it takes more than 3s to launch.
+
+2. **Poor user experience:** Taking the high-frequency scenario—the consultation page—as an example, It faces issues like long list page sticking, unsmooth scrolling, and UI flashing back with the loading of historical messages. These problems result in a low user task completion rate, failing to meet user demands and reducing user retention.
+
+## Optimization process
+
+<Image
+  alt={`Website`}
+  src={`/images/performance/performance-3.jpg`}
+  width={800}
+  height={200}
+/>
+
+**Throughout the performance optimization process, we have adopted a progressive optimization strategy:**
+
+1. **Monitoring:** Identifying the problem areas is crucial for performance optimization. Performance monitoring allows us to pinpoint performance bottlenecks.
+2. **Optimization:** Addressing these issues involves developing and implementing a comprehensive set of performance optimization strategies.
+3. **Assurance:** Preventing the recurrence of issues requires robust high-performance assurance, especially during rapid business iterations. This is a long-term challenge that we need to consistently manage.
+
+### I. Establishing a Performance Monitoring System for Mini Programs
+
+First, let's talk about monitoring. When we began developing a performance monitoring system for our mini programs, we faced two main challenges:
+
+1. The WeChat platform does not provide authoritative performance metric recommendations. How can we transform the previously mentioned performance issues into specific, quantifiable metrics?
+
+2. Once the metrics are defined, how can we design and implement a stable, efficient monitoring solution that provides meaningful performance insights?
+
+Here's how we addressed these challenges:
+
+### Challenge 1: Defining Performance Metrics
+
+When we talk about reasonable performance metrics, we can reframe the question as: 
+
+How can performance optimization metrics be aligned with user experience optimization metrics? 
+
+<Image
+  alt={`Website`}
+  src={`/images/performance/performance-4.jpg`}
+  width={800}
+  height={200}
+/>
+
+Based on our optimization goals, we categorized the performance metrics into **Startup Performance** and **Runtime Performance**, aligning them with user experience as follows:
+
+- **Startup Performance**: This relates to the loading speed when a user enters the mini program. If the white screen time is too long, exceeding the user's tolerance, they may abandon the app.
+- **Runtime Performance**: This is more than just "fast enough" performance. Besides the initial loading speed, we need to consider whether the mini program lags during use, crashes frequently, displays white screens, or has unresponsive user interactions. It involves a comprehensive evaluation of every touchpoint that users experience.
+
+#### Challenge 1 -- Startup Performance
+
+To determine startup performance metrics, we analyzed the entire startup process of the mini program from two dimensions: the mini program engine and user experience.
+
+The startup process can be roughly divided into five steps:
+
+<Image
+  alt={`Website`}
+  src={`/images/performance/performance-6.jpg`}
+  width={800}
+  height={200}
+/>
+
+1. **Package Downloading Stage**: At this point, the user sees a loading screen. The framework's tasks include:
+   - **Information and Environment Preparation**: The WeChat client fetchs configuration, version, and permission information. prepares the basic environment for running the mini program code.
+   - **Fetching the Code Package**: The mini program is hosted on Tencent Cloud. A mini program may consist of a main package and several sub-packages. During startup, the server downloads the main Mini-app package.
+
+2. **Code Injection Stage**: The mini program is divided into a logic layer and a rendering layer. During this stage, the framework injects the JavaScript code into the engine, and triggers the mini program's `App.onLaunch` lifecycle event. We consider `App.onLaunch` as the mark of the mini program's startup completion. The WXSS and WXML(Mini-app version of CSS and HTML) are compiled and injected into the rendering layer, containing the page structure and style information. The injection time is mainly related to the complexity of the page structure and the number of custom components used.
+
+3. **First Screen Creation Stage**: During this period, the logic layer creates page instances, and the rendering layer waits for `initialData` to render.
+
+4. **First Screen Rendering Stage**: Combining the initial data from the logic layer with the page structure and style information from the rendering layer, the framework renders the first screen of the mini program and triggers the `Page.onReady` event. At this point, the user sees a page based on the frontend's default data state, which is not the real data returned from backend requests, meaning the information is not yet valuable to the user.
+
+5. **First Screen Interactive Stage**: If there are no other methods in `onLoad` and `onShow`, the page becomes interactive after the initial rendering. However, in reality, many logic and asynchronous API requests are performed. After fetching specific business data and completing calculations, multiple `setData` calls are made to render the final page. Only then does the user see the complete first screen content.
+
+So far, we simply understand what the startup stage small program does, you can see that in this process, from the perspective of developers, what we can do for startup process are the following steps:
+
+<Image
+  alt={`Website`}
+  src={`/images/performance/performance-7.jpg`}
+  width={800}
+  height={200}
+/>
+
+1. Main/Sub-package download and load time.
+2. Code injection time.
+3. Execution time of synchronous scripts in `onLaunch` and `onShow`.
+4. First screen initial rendering time.
+5. Time to interactivity for the core area of the first screen.
+
+We correspond these steps to five startup performance metrics, and add a total startup time, thus establishing the startup performance metrics.
+
+<Image
+  alt={`Website`}
+  src={`/images/performance/performance-8.jpg`}
+  width={800}
+  height={200}
+/>
+
+#### Challenge 1 -- Runtime Performance
+
+Then, in terms of runtime performance, We analyzed the performance issues encountered by users during the mini program's operation and categorized them into three types: Experience, Exception, and Loading.
+
+<Image
+  alt={`Website`}
+  src={`/images/performance/performance-9.jpg`}
+  width={800}
+  height={200}
+/>
+
+- Experience Issues: These are primarily characterized by page stuttering or lagging.
+- Exception Issues: It involves white screen display or small program crashes.
+- Loading Issues: These include slow initial page loading or slow download times for specific modules.
+
+Next, for each of these performance problems, we summarize the reasons behind them and establish corresponding runtime performance metrics. 
+
+At this stage, the following runtime performance indicators are developed:
+
+<Image
+  alt={`Website`}
+  src={`/images/performance/performance-10.jpg`}
+  width={800}
+  height={200}
+/>
+
+Here's a brief explanation regarding the time consumption of `setData` and `memory alarms`:
+
+- Time consumption of `setData`: 
+  - When data is updated in a small program, `setData` is called as a cross-thread communication API. Data can be updated through user interaction or when data is returned from the backend interface. The start point of time consumption for `setData` is when the logical layer initiates the call, while its end point is when rendering layer completes rendering and notifies the logical layer. Therefore, measuring `setData's` time consumption provides an intuitive reflection of page rendering situations.
+- Memory alarm: 
+  - Mini program crashes are typically caused by insufficient memory. When a mini program uses too many system resources, it may be terminated by the system or actively reclaimed by the WeChat client. Since we cannot directly monitor mini program crashes, we use memory alerts to indirectly track and analyze which pages have higher crash rates, allowing us to target these areas for optimization.
+
+That concludes our process of defining all performance Metrics.
+
+<Image
+  alt={`Website`}
+  src={`/images/performance/performance-44.jpg`}
+  width={800}
+  height={200}
+/>
+
+### Challenge 2: Selection and Implementation of the Monitoring System
+
+Before developing the monitoring system, we established three key goals:
+
+<Image
+  alt={`Website`}
+  src={`/images/performance/performance-11.jpg`}
+  width={800}
+  height={200}
+/>
+
+- Metric Collection: The monitoring solution must be capable of collecting the performance metrics summarized above. This is the most fundamental requirement.
+- Granular Data: In addition to obtaining the performance metrics themselves, we also require a significant amount of contextual information such as current page, user device models, and network conditions. This will enable us to further analyze the data from various dimensions.
+- Flexibility: We aim to control our own data storage. This is essential for managing data retention periods and facilitates feature extensions such as data analysis and alerting.
+
+Based on these three objectives, we have chosen custom reporting as our approach for performance monitoring. This is the initial version of our performance monitoring system:
+
+<Image
+  alt={`Website`}
+  src={`/images/performance/performance-12.jpg`}
+  width={800}
+  height={200}
+/>
+
+We primarily use a zero-impact (It minimally affects business logic) reporting approach. By intercepting WeChat's lifecycle methods and certain WeChat APIs to calculate time metrics.
+<Image
+  alt={`Website`}
+  src={`/images/performance/performance-13.jpg`}
+  width={800}
+  height={200}
+/>
+
+#### Challenge 2 -- Lacks of metrics collection capabilities
+
+However, at this stage, we are faced with an issue where our custom reporting-based monitoring scheme still lacks metrics collection capabilities.
+
+To address this problem, we analyzed both official WeChat performance monitoring methods and those used by other companies in order to supplement its missing functionalities:
+
+<Image
+  alt={`Website`}
+  src={`/images/performance/performance-14.jpg`}
+  width={800}
+  height={200}
+/>
+
+Finally, we selected the green sections in the table as supplements to our performance monitoring methods:
+
+<Image
+  alt={`Website`}
+  src={`/images/performance/performance-15.jpg`}
+  width={800}
+  height={200}
+/>
+
+They include:
+
+- Performance Trace Tools
+  - In the development version of the mini program, you can open the performance panel to view some performance data during the mini program's operation. This allows us to obtain data such as "runtime memory," which is not accessible through conventional front-end monitoring methods.
+- WeChat Open Platform Metrics
+  - WeChat provides server-side API calls with greater flexibility compared to the mini program backend, allowing businesses to manage data storage and presentation independently.
+- `wx.getperfotmance`
+  - This front-end API allows us to obtain key metrics such as total startup time and code injection time.
+- TAM  
+  - A company-wide one-stop front-end monitoring solution, TAM focuses on traditional web front-end monitoring capabilities. We use it to complement our front-end error monitoring.
+- `miniprogram-ci`
+  - Extracted from the WeChat Developer Tools, this module handles the compilation of mini program code. It allows us to obtain the sizes of the main package and sub-packages during each pipeline run.
+
+However, at this stage, we are faced with an issue as below: 
+
+#### Challenge 2 -- How to ensure service stability and data integrity
+
+To address this issue, we implemented the following measures:
+
+<Image
+  alt={`Website`}
+  src={`/images/performance/performance-16.jpg`}
+  width={800}
+  height={200}
+/>
+
+- Retry Mechanism: To ensure successful data downloading, we implemented a retry mechanism that pulls the previous day's data at 5 AM and 8 PM.
+- Duplicate Data Check: For data that has already been successfully retrieved, the system skips it during subsequent pulls.
+- Manual Intervention Mechanism: We provided an open API that allows for manual data supplementation in case of data loss or anomalies.
+- JSON-Schema Based Data Self-Check: We added an asynchronous validation mechanism based on JSON-schema to check data legality. Invalid data is discarded and triggers an alert.
+
+At this point, the entire small program performance monitoring system has been established. 🎉🎉🎉
+
+
+### II.  Let's discuss performance optimization process.
+
+<Image
+  alt={`Website`}
+  src={`/images/performance/performance-17.jpg`}
+  width={800}
+  height={200}
+/>
+
+Having established the monitoring system, we can now quantify performance issues using metrics (iOS 13 / 4G / iPhone 11).
+
+The following is the performance report before optimization.  By comparing it with WeChat experience scores and industry-leading mini programs, we identified the following performance bottlenecks, highlighted in red in the table.
+
+<Image
+  alt={`Website`}
+  src={`/images/performance/performance-18.jpg`}
+  width={800}
+  height={200}
+/>
+
+Based on these metrics, we can see that the issues primarily fall into three categories:
+
+
+<Image
+  alt={`Website`}
+  src={`/images/performance/performance-45.jpg`}
+  width={800}
+  height={200}
+/>
+
+- During the mini program startup process, the average appLaunch time is around 2 seconds, and the average time for the core area of the first screen to become interactive is between 2 to 3 seconds. Both of these durations are too long.
+
+- In long list pages like the IM scenario shown in the figure above, the setData time increases as more data is fetched, causing the page to become progressively more laggy. Additionally, the runtime memory shows an increasing trend, starting at around 100MB when the page is first loaded and potentially rising to 800MB as the user continues to interact with the page.
+
+Therefore, we have identified three key areas for optimization: ***launch optimization, first screen rendering optimization, and `setData` optimization.***
+
+<Image
+  alt={`Website`}
+  src={`/images/performance/performance-21.jpg`}
+  width={800}
+  height={200}
+/>
+
+---
+
+### Key Focus 1: Startup Time (appLaunch) Optimization
+
+First, let's discuss the optimization of startup (appLaunch) time. By performing a simple analysis of the startup initialization time, we identified that the initial information/environment preparation time is not within the developer's control for optimization. Therefore, our primary focus is on optimizing the package downloading time and the code injection time.
+
+<Image
+  alt={`Website`}
+  src={`/images/performance/performance-22.jpg`}
+  width={800}
+  height={200}
+/>
+
+**Startup Time (appLaunch) - Package Downloading Time Optimization**
+
+The package downloading time is positively correlated with the size of the mini program's main package. 
+
+After a simple investigation, we found that when the main package size is kept within 1MB, the downloading time can be controlled to around 1 second. At the time, our main package size had already reached 1.9MB, nearing the WeChat main package limit of 2MB. Therefore, we decided to slim down the mini program package size.
+
+Key Considerations for Package Size Optimization:
+- 1.How to prevent mistakenly deleting modules that affect online functionality during package size optimization?
+- 2.How to find the appropriate optimization strategy for each type of resource in the mini program, considering the various resource types?
+
+**To address problem 1**, utilize WeChat development tool's static analysis function to identify dependency-free modules and duplicate modules.
+
+<Image
+  alt={`Website`}
+  src={`/images/performance/performance-23.jpg`}
+  width={800}
+  height={200}
+/>
+
+In this way, the modules to be removed can be found quickly and with minimal impact on online functions. After optimization, we also carry out full functional testing before going online. Avoid negative impact online.
+
+**To address problem 2**
+
+- Apply standard web optimization methods to reduce the size of file resources.
+- Use Special Optimization Techniques for Mini Program Scenarios
+
+The following image illustrates all the package size optimization strategies we used:
+
+<Image
+  alt={`Website`}
+  src={`/images/performance/performance-24.jpg`}
+  width={800}
+  height={200}
+/>
+
+Its core idea can be summed up in four words:
+
+- **Delete:** Delete content that is offline, obsolete, irrelevant, or unnecessary.
+- **Move:** Move all non-core non-essential content out of the main package. Static resources can be moved to `cdn`, static pages can be moved to h5, loaded via `webview`, and public components and pages that are not used by tab pages can be moved to subcontracting as much as possible.
+- **Compression:** Different compression methods are used for different resource types, such as compression of vvendor.js through `js-Treeshaking`, and the volume can be reduced by 50% by changing `png` to jpg format.
+- **Merge:** Merge reusable modules.
+
+After a series of optimizations, the doctors client's code package was reduced from 1.9M to 1.36M; the startup time was reduced by about 300ms.
+
+
+**Startup Time (appLaunch) - Code injection time optimization**
+
+When the small program is started, the code in the main package will be uniformly injected into the small program running environment and packaged into an `appjs` (generally 1-2 M), which includes the logic code that is not used in the first screen, affecting the startup time.
+
+Solution: Opened the small program official code lazy injection, the principle is similar to `webpack` on demand packaging, only injected the current page needs custom components and the current page code. Developers can configure in `app.json`:
+
+```json
+{
+  "lazyCodeLoading": "requiredComponents"
+}
+```
+When this configuration is enabled, the code injection time is reduced by 50% and the startup time is reduced by about 150ms.
+
+
+**Startup Time (appLaunch) Optimization - Overall Benefits**
+
+After optimizing both the doctor and patient interfaces, the mini program startup (appLaunch) time decreased by approximately 20%.
+
+<Image
+  alt={`Website`}
+  src={`/images/performance/performance-26.jpg`}
+  width={800}
+  height={200}
+/>
+
+
+### Key Focus 2: First Screen Rendering Optimization
+
+Let's talk about first screen rendering optimization
+
+<Image
+  alt={`Website`}
+  src={`/images/performance/performance-27.jpg`}
+  width={800}
+  height={200}
+/>
+
+First, we conducted a detailed analysis of the first screen rendering time. After the mini program completes its startup, it initiates two requests: one for the login interface and one for fetching doctor information. All other logic on the homepage waits for these two requests to complete, severely blocking the first screen rendering time.
+
+Additionally, the combined time for other homepage requests and rendering is around 1900ms. Therefore, the optimization strategies we used for these two parts are:
+
+<Image
+  alt={`Website`}
+  src={`/images/performance/performance-29.jpg`}
+  width={800}
+  height={200}
+/>
+
+- First Screen Blocking Time Optimization
+- Homepage Interface Logic Optimization
+
+The average time for the login interface is 600ms. We first analyzed this part and found that establishing the SSL connection takes up 50% of the total interface time. We explored whether this part could be optimized, but after detailed research, we discovered that this process requires multiple interactions with WeChat, leaving no room for optimization.
+
+We also considered aggregating these two interfaces on the backend. However, even after aggregation, it only optimized by 100ms, which is far from sufficient for improving the first screen rendering time.
+
+
+<Image
+  alt={`Website`}
+  src={`/images/performance/performance-29-1.jpg`}
+  width={800}
+  height={200}
+/>
+
+
+
+Final Solution: Data Pre-fetching
+
+- The final solution was to use data pre-fetching. This involves initiating an HTTP request from the mini program to the third-party server via WeChat's server proxy during mini program startup. The response data is then stored on the local client for the mini program frontend to retrieve.
+- Once the mini program has loaded, it only needs to call the WeChat API `wx.getBackgroundFetchData` to retrieve the data from local cache. This approach allows us to move the initiation time of these two blocking requests from the appLaunch phase to the moment the user clicks to enter the mini program.
+
+> After the implementation of data pre-fetching, the time for the core area of the first screen to become interactive was reduced by approximately 700ms, showing a significant improvement in performance.🎉
+
+**First Screen Rendering Optimization - Homepage Interface Logic Optimization**
+
+The homepage of the doctor's interface serves as a core entry point, carrying multiple functions. The first screen makes a total of 18 business interface calls, along with its own logging and cloud communication queries.
+
+The accumulation and queuing of these interfaces lead to slower loading times. Additionally, we found some unreasonable logic in the homepage implementation, such as placing status queries that do not require frequent updates inside Page.show.
+For this part, the main optimization methods we use as follow:
+
+1. **Advance Critical Requests:**
+   - For example, moving the retrieval of doctor registration information from the homepage to `app.onLaunch`. There is approximately 200ms to 300ms from `app.onLaunch` to the homepage's `onLoad`, gaining about 200ms for first screen rendering.
+
+2. **Delay Non-Critical Requests:**
+   - Postpone requests for data not needed on the first screen to later stages.
+
+3. **Backend Interface Aggregation:**
+   - Aggregate frequently updated but closely related interfaces on the backend.
+
+4. **Parallelize Independent Requests:**
+   - Convert serial requests without dependencies to parallel requests.
+
+5. **Optimize Static Resource Caching:**
+   - Extend browser cache duration for static resources from the default ten minutes to one week, since our static resources use hashes, avoiding issues with same-name different files.
+
+6. **Enable HTTP/2:**
+   - From version 2.10.4, `wx.request` supports HTTP/2. HTTP/2's binary framing layer allows all requests and responses to be sent over a single TCP connection, eliminating unnecessary delays and reducing page load time.
+
+<Image
+  alt={`Website`}
+  src={`/images/performance/performance-31.jpg`}
+  width={800}
+  height={200}
+/>
+
+Additionally, we implemented interface caching. We observed that most of the first screen interface data in the cloud medical mini program is stable and has low real-time requirements. Therefore, we designed a general interface data caching solution:
+
+- Interface request data is first read from local cache.
+- An HTTP request is sent regardless of whether local cache data exists.
+- The locally cached data is used for initial page rendering to reduce user wait time.
+- Upon successful HTTP response, the local cache is updated and the page is refreshed with the new data, ensuring that users always see the most up-to-date information.
+
+After using the first screen interface cache, the interactive time of the core area of the page is reduced by about 300ms
+
+<Image
+  alt={`Website`}
+  src={`/images/performance/performance-30.jpg`}
+  width={800}
+  height={200}
+/>
+
+**First Screen Rendering Optimization -Total Benefits**
+
+After the first screen rendering optimization is completed, the interaction time of the core area of the first screen on the doctor side is reduced from 2560ms to 983ms. The interaction time of the core area of the patient-side first screen was reduced from 1030ms to 650ms
+
+This is the comparison of the homepage before and after optimization. Click the Twitter details to view.
+
+<StaticTweet id="1795466946517041425" />
+
+### Key Focus 3: SetData Optimization
+
+<Image
+  alt={`Website`}
+  src={`/images/performance/performance-40.jpg`}
+  width={800}
+  height={200}
+/>
+
+Currently, we are facing an issue where the `setData` duration keeps increasing in long list pages, causing the page to lag. Here's a simple analysis of the problem:
+
+<Image
+  alt={`Website`}
+  src={`/images/performance/performance-46.jpg`}
+  width={800}
+  height={200}
+/>
+
+1. **Expensive Operation:** 
+   - `setData` is the method used in mini programs for cross-thread data updates. It is inherently an expensive operation. In long list pages, the large data volume and frequent `setData` calls further degrade performance.
+
+2. **Framework Encapsulation:**
+   - We are using the underlying development framework mpvue, which further encapsulates `setData`. For developers, `setData` is essentially a black box process, making it difficult to pinpoint the root cause of the issues.
+
+To solve this problem, we conducted an in-depth analysis of the `setData` process on the cloud medical mini program from the perspective of framework operation.
+
+<Image
+  alt={`Website`}
+  src={`/images/performance/performance-34.jpg`}
+  width={800}
+  height={200}
+/>
+
+We are using mpvue, a Vue-like cross-platform framework for mini programs. It leverages Vue's reactive two-way binding and vnode capabilities to optimize the native `setData` in mini programs. When a page is loaded, a Vue instance is initialized, followed by a mini program Page instance. When data changes, Vue's reactive layer collects the changes and provides them to the render function, which generates the vnode.
+
+In a typical web scenario, the next step would be to map the vnode to the real DOM. However, mini programs do not provide DOM manipulation APIs. Therefore, the framework marks the updated values as dirty, traverses the vnode, assembles the marked data into JSON, and passes it to the Page instance for updating.
+
+**Problems Identified:**
+
+1. **Full Array Updates:**
+   - During dirty checking, the comparison for arrays is done against the values in the Vue instance. Since Vue does not retain a copy of the array before changes, array updates are performed as full updates rather than diffing.
+
+2. **Redundant Virtual DOM:**
+   - The virtual DOM design is redundant here since mini programs do not allow direct DOM manipulation.
+
+Additionally, we discovered that mpvue does not support custom components in mini programs.
+
+<Image
+  alt={`Website`}
+  src={`/images/performance/performance-35.jpg`}
+  width={800}
+  height={200}
+/>
+
+This issue arises because, at the time of mpvue's inception, WeChat mini programs did not support custom components, making component-based development impossible. To address this, mpvue compiles user-written components into templates in WXML. Here’s an example of a compiled output:
+
+<Image
+  alt={`Website`}
+  src={`/images/performance/performance-36.jpg`}
+  width={800}
+  height={200}
+/>
+
+
+**Understanding the Limitations of mpvue**
+
+By using import, child components, parent components, and the page are ultimately compiled into a single large template. Data defined in components is compiled into the Page's data, and updates to component data are made by mapping paths to Page.setData. As a result, local updates in each component become global updates at the page level.
+
+The mini program's component model is very similar to the Shadow DOM standard in Web Components. Each component has an independent node tree and its own logical space, including separate data, setData calls, and createSelectorQuery execution domains. Page-level updates are less efficient than component-level local updates.
+
+**Conclusion and Solution**
+
+The performance of mpvue no longer meets our needs. Since the project is based on Vue, migrating to a similar Vue-like mini program framework incurs low cost. Therefore, we decided to solve this issue by migrating to a new framework.
+
+<Image
+  alt={`Website`}
+  src={`/images/performance/performance-37.jpg`}
+  width={800}
+  height={200}
+/>
+
+### Framework Selection and Migration to uni-app
+
+We researched and compared several Vue-like mini program development frameworks from the perspectives of incremental updates, custom components, H5 adaptation, and community activity. Ultimately, we chose uni-app as our development framework.
+
+**Image** (Include the relevant image here to show the comparison and selection process)
+
+#### Improvements Brought by uni-app:
+
+1. **Vue Layer Optimization:**
+   - The vnode comparison is removed in the Vue layer.
+
+2. **Efficient JSON Diff:**
+   - uni-app uses the JSON Diff library from westore, which is efficient and lightweight. It allows for more thorough diff calculations and efficiently handles large data structures.
+
+3. **Support for Custom Components:**
+   - uni-app fully supports custom components in mini programs.
+
+After completing the migration, we used the previously underperforming conversation page as an example. We tested the average `setData` rendering time by pulling the chat history thirteen times. The following comparison chart shows the improvements in rendering times.
+
+**Comparison Chart**
+
+<Image
+  alt={`Website`}
+  src={`/images/performance/performance-38.jpg`}
+  width={800}
+  height={200}
+/>
+
+### Long List Scenarios: setData Optimization
+
+#### Observations
+
+1. **mpvue:** There is a positive correlation between `setData` time and the number of new data fetches.
+2. **uni-app:** There is no significant correlation between `setData` time and the number of new data fetches, stabilizing around 3ms.
+
+#### Post-Migration Analysis
+
+After migrating to uni-app, the `setData` performance improved, temporarily alleviating the lag issues in long list scenarios. However, this did not fundamentally solve the problem. As the list loads new content, the page content increases, the DOM tree structure becomes more complex, and the time for Recalculate Style and Layout increases, ultimately causing `setData` performance to degrade again.
+
+### Optimization Approach: Virtual Scrolling
+
+**Core Idea:** Render only the data visible on the screen and update only the locally visible area. Use placeholder nodes for items that are no longer in the visible area.
+
+#### Challenges and Solutions
+
+1. **Calculating the Height of Placeholder Nodes:**
+   - Developers define how many list items constitute one screen. Convert the long list's one-dimensional array into a two-dimensional array, with each item in the two-dimensional array corresponding to one screen (not necessarily an actual screen, just longer than one screen's length).
+   - After rendering, get the height of the latest rendered screen and assign it to the `pageHeightArr` array, which records the height of each screen. Use this height as the standard for calculating the height of placeholder nodes after scrolling past the current screen.
+
+2. **Handling Fast Scrolling in Virtual Scrolling:**
+   - Pre-render a few additional list items before and after the visible elements. This allows for shifting these pre-rendered elements during small scrolls instead of re-rendering them. When the scroll amount exceeds the pre-rendered elements, then re-render.
+
+### Optimization Benefits
+
+Comparing the initialization and selection times in the patient list under the Group Assistant of the Tencent Cloud Medical mini program before and after integrating the long list component:
+
+- **Horizontal Axis:** Number of list data items.
+- **Effectiveness:** When the list data is small, the virtual scrolling optimization has little effect. As the list data increases exponentially from 100 to 10,000 items, the `setData` time forms a steep curve, whereas virtual scrolling remains almost unchanged.
+- **Memory Usage:** The peak runtime memory reduced from 800MB to 500MB.
+
+By implementing virtual scrolling, we effectively mitigated the performance degradation issues in long list scenarios, significantly improving both rendering performance and memory usage.
+
+<Image
+  alt={`Website`}
+  src={`/images/performance/performance-39.jpg`}
+  width={800}
+  height={200}
+/>
+
+The virtual scrolling component has now been uploaded to npm and can be integrated as a WeChat third-party component.
+
+```shell
+npm i mp-v-scroll
+```
+This is the comparison of setData before and after optimization.（Click twitter detail to watch more）
+
+The left side is before optimization, the right side is after optimization.
+
+We can see that after optimization, regardless of how the list is fetched, the setData time remains around 1ms.
+
+<StaticTweet id="1795470049656087007" />
+
+## Phase Summary
+
+After completing these performance optimizations, we can summarize a set of general performance optimization principles:
+
+- Lightweight:
+
+  - Minimize the size of data, resources, code logic, and interface requests. This is the primary approach we used for performance optimization.
+  
+- In Advance:
+
+  - Prepare the necessary environment and data for page rendering in advance, such as data pre-fetching and interface data caching.
+
+- Parallel:
+
+  - Reduce unnecessary sequential waiting processes, such as asynchronously preparing the data needed for the page during page creation.
+
+- Real-time Feedback:
+  - User actions should always be the highest priority, providing real-time UI feedback, such as skeleton screens and loading indicators.
+
+The following examples are provided for your reference:
+
+<Image
+  alt={`Website`}
+  src={`/images/performance/performance-5.jpg`}
+  width={800}
+  height={200}
+/>
+
+## Summary
+
+At this point, we have covered most of the optimization techniques. Here are the overall performance optimization results:
+
+<Image
+  alt={`Website`}
+  src={`/images/performance/performance-41.jpg`}
+  width={800}
+  height={200}
+/>
+
+## Assurance
+
+<Image
+  alt={`Website`}
+  src={`/images/performance/performance-43.jpg`}
+  width={800}
+  height={200}
+/>
+
+
+While optimizing performance, we also noticed that with continuous business iterations, previously optimized performance metrics tend to degrade again. Ensuring high performance during rapid version iterations has become a long-term challenge that we need to overcome.
+
+To address this issue, we have adopted the following main strategies:
+
+- Performance Scoring:
+
+  - Develop a scoring mechanism for page performance and mini program startup performance.
+
+- Performance Alerts:
+
+  - Implement performance alerting systems to notify us of any performance degradations in real-time.
+
+<Image
+  alt={`Website`}
+  src={`/images/performance/performance-42.jpg`}
+  width={800}
+  height={200}
+/>
+
+Time Consumption: Utilize big data from the user base and compare it with historical versions to analyze. The analysis found a performance decline in new additions, and a periodic alert strategy was adopted.
+
+Anomalies: For data of the type "front-end anomalies," the TAM trend alert capability is used.
+
+Special Optimization: Establish a mechanism for page performance responsibility. Conduct special page optimizations for pages with performance declines in new versions.
+
+---
+
+**Conclusion:** The entire performance optimization for the cloud medical business mini-program is now complete. In this optimization effort, we identified potential points that could affect the performance of the mini-program during its operation. We then proposed feasible optimization suggestions and implementation plans for these points of impact. Ultimately, these small optimizations combined to produce a significant improvement in the performance of the mini-program.
+
+Additionally, we often receive a lot of real user feedback about their experiences, which cannot be reflected by data alone. Therefore, we have set up a dedicated user experience issue group to follow up on user experience problems and drive improvements from the development side.
+
+

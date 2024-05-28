@@ -402,26 +402,26 @@ export default function Page() {
         </p>
         <div className="my-4 flex w-full flex-col space-y-4">
           <BlogLink
-            name="What Makes A Great Developer Experience?"
-            subName={"cross-platform development, and browser."}
-            slug="developer-experience-examples"
+            name="Tencent Cloud Mini-App Performance Optimization Practices"
+            subName={" How to Reduce Startup Time by 60%"}
+            slug="performance"
           />
           <BlogLink
             name="Mastering CI/CD: A Beginner’s Guide to K8s Resource Management"
-            subName={"Understand k8s and deploy your own application."}
+            subName={"Understand Kubernetes: Launch Your First Application"}
             slug="beginner-guide-k8s"
           />
           <BlogLink
-            name="What Makes A Great Developer Experience?"
+            name="Uni-Code: Leveraging Monorepo for Enhanced Collaboration and Efficiency"
             subName={
-              "cross-platform development, and browser.platform development"
+              "Streamlining Your Team's Development Processes"
             }
             slug="developer-experience-examples"
           />
                     <BlogLink
-            name="What Makes A Great Developer Experience?"
+            name="Unveiling React: A Deep Dive into the Principles"
             subName={
-              "cross-platform development, and browser.platform development"
+              "Building Your Own React Framework"
             }
             slug="developer-experience-examples"
           />
