@@ -109,7 +109,7 @@ export default function Blog({ params }) {
             url: `https://leerob.io/blog/${post.slug}`,
             author: {
               '@type': 'Person',
-              name: 'Lee Robinson',
+              name: 'Midori',
             },
           }),
         }}

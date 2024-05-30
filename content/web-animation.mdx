@@ -1,0 +1,165 @@
+---
+title: "How to Achieve High-Performance Web Animations at Zero Development Cost"
+publishedAt: '2019-12-10'
+summary: ''
+---
+## Problem:
+
+When implementing various promotional activities, we often need to create very complex animation effects, such as card draws and prize wheels. 
+
+However, each traditional web animation solutions have their own shortcomings. Making our development very painful. Here, we provide a comparison of some options:
+
+<Table
+  data={{
+    headers: [
+      'Type',
+      'Development Cost',
+      'Resource Size',
+      'Effect',
+    ],
+    rows: [
+      [
+        'CSS',
+        'High communication cost, requires front-end to implement keyframes one by one 😭',
+        'Small',
+        'Limited effects, only supports displacement, scaling, etc.',
+      ],
+      [
+        'Image Frame Sequence',
+        'UE directly exports resource images, limited by image compression algorithm, resources are too large 😓',
+        'Limited by image compression algorithms, the resources are too large.',
+        'Can achieve any designer effect',
+      ],
+      [
+        'Lottie',
+        'UE directly exports JSON files, low development cost, small resources',
+        'Small',
+        'Only supports vector animation',
+      ],
+    ],
+  }}
+/>
+
+
+## Solutions
+
+<Callout emoji="💡">
+Currently, I offer React open-source components of this animation solution. Check [this repository](https://github.com/midori-profile/uni-code). If it helps you, I hope you'll give me a star.😊✨
+</Callout>
+
+To build a high-performance web animations at zero development Cost, We had the following approach:
+
+- Construct an alpha transparency channel for video resources that do not have a transparent channel.
+- Use the video tag to play the video, and use the canvas tag to render the video frame by frame.
+
+Our goals are:
+
+<ProsCard 
+  title="" 
+  pros={[
+    "Low development cost: Design a component where AE-exported video resources can be directly turned into web animation, resulting in zero communication development costs.",
+    "Small Resource Size: Utilize the advantages of video compression algorithms to achieve resource volumes far smaller than image frame sequences.",
+    "High Fidelity: Complete reproduction of effects designed by designers."
+  ]}
+/>
+
+There are no similar approaches in the industry. To verify the feasibility of the solution, I conducted detailed research on implementation plans and performance.
+
+### Implementation
+
+今天就写到这里
+
+
+Here is the general implementation process of the component. I have divided it into four main steps:
+
+1. **Resources**: After the designer provides the animation files, the resources undergo preprocessing. The final result is an MP4 file with the animation's alpha channel information on the left and the animation's RGB channel information on the right.
+2. **Environment**: The component initializes internally, registers the component API, and prepares the drawing environment. During these processes, we define the size of the OpenGL rendering window and ensure that data from the previous rendering iteration is cleared at the start of each new iteration.
+3. **Drawing**: The focus of this step is on shader processing.
+4. **Recycling**: After the component is destroyed, the component resources undergo various levels of recycling.
+
+<Image
+  alt={`Website`}
+  src={`/images/animation/animation-1.jpg`}
+  width={800}
+  height={200}
+/>
+
+To construct the alpha transparency channel using video resources, WebGL is required. The process is quite challenging, so let's elaborate on it.
+
+First, let's see what the video resources provided by the designer look like:
+We can see that the video is divided into two parts, the left part is grayscale, and the right part is colored. The grayscale values on the left can be directly used as alpha channel data, and combined with the RGB data on the right to form RGBA information, creating a texture with a transparent channel that can be drawn to the canvas.
+
+Below is the WebGL processing code. Before explaining this code, let's first clarify some basic WebGL concepts.
+
+#### Shaders
+
+> Shaders are programs that run on the GPU. They can't communicate with each other directly. They are programs that transform input into output and are used for rendering effects.
+
+The vertex shader is:
+The fragment shader is:
+
+## Varying
+
+Varying type variables are used to pass data from the vertex shader to the fragment shader, as OpenGL cannot directly pass data to the fragment shader. To pass data, define a variable starting with `varying` before the `main` function in the vertex shader.
+
+## Texture Coordinates
+
+For example, to map a texture to a triangle, we need to specify which part of the texture corresponds to each vertex of the triangle. This way, each vertex is associated with a texture coordinate, indicating which part of the texture image to sample. The texture coordinates on the x and y axes range from 0 to 1 (we are using 2D texture images).
+
+The texture coordinates of the triangle look like this:
+```c
+GLfloat texCoords[] = {
+    0.0f, 0.0f, // bottom left
+    1.0f, 0.0f, // bottom right
+    0.5f, 1.0f // top center
+};
+```
+
+Let's take a look at this code:
+
+```javascript
+// Variable naming explanation
+// a_Position: Represents the input vertex position.
+// v_TextureCoord: Represents the texture coordinates passed to the fragment shader.
+// u_Texture: Represents the texture sampler in the fragment shader.
+
+// Vertex shader code
+const vertexShaderSource = `
+attribute vec2 a_Position;
+varying vec2 v_TextureCoord;
+
+void main() {
+    // Map coordinates from (-1, 1) to (0, 1) for texture sampling
+    v_TextureCoord = (a_Position + 1.0) * 0.5;
+    
+    // Set vertex position
+    gl_Position = vec4(a_Position, 0.0, 1.0);
+}`;
+
+// Fragment shader code
+const fragmentShaderSource = `
+precision highp float;
+uniform sampler2D u_Texture;
+varying vec2 v_TextureCoord;
+
+void main() {
+    // Sample RGB values from the right side of the texture
+    vec3 color = texture2D(u_Texture, v_TextureCoord * vec2(0.5, 1.0) + vec2(0.5, 0.0)).rgb;
+    
+    // Sample alpha values from the left side of the texture
+    float alpha = texture2D(u_Texture, v_TextureCoord * vec2(0.5, 1.0)).r;
+    
+    // Set fragment color with RGB and alpha
+    gl_FragColor = vec4(color, alpha);
+}`;
+```
+
+As we can see, first we set up the vertex shader to map the texture coordinates on the video, then we set up the fragment shader. Using GLSL's built-in function `texture2D`, we get the texture color at the corresponding position, sampling the RGB information from the right side of the texture and the grayscale information from the left side, and completing the combination.
+
+## Preview
+
+Click the Twitter details to view.
+
+<StaticTweet id="1795466946517041425" />
+
+Alternatively, visit this page to preview the animation effect.

@@ -11,14 +11,14 @@ export const metadata: Metadata = {
   metadataBase: new URL('https://leerob.io'),
   title: {
     default: 'Midori',
-    template: '%s | Lee Robinson',
+    template: '%s | Midori',
   },
   description: 'Developer, writer, and creator.',
   openGraph: {
-    title: 'Lee Robinson',
+    title: 'Midori',
     description: 'Developer, writer, and creator.',
     url: 'https://leerob.io',
-    siteName: 'Lee Robinson',
+    siteName: 'Midori',
     locale: 'en_US',
     type: 'website',
   },
@@ -34,7 +34,7 @@ export const metadata: Metadata = {
     },
   },
   twitter: {
-    title: 'Lee Robinson',
+    title: 'Midori',
     card: 'summary_large_image',
   },
   verification: {
