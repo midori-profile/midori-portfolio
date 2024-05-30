@@ -9,19 +9,20 @@ import React from 'react';
 import { LiveCode } from './sandpack';
 
 function Table({ data }) {
-  let headers = data.headers.map((header, index) => (
-    <th key={index}>{header}</th>
+  const headers = data.headers.map((header, index) => (
+    <th key={index} style={{ maxWidth: '300px', wordWrap: 'break-word', whiteSpace: 'normal' }}>{header}</th>
   ));
-  let rows = data.rows.map((row, index) => (
-    <tr key={index}>
+  
+  const rows = data.rows.map((row, rowIndex) => (
+    <tr key={rowIndex}>
       {row.map((cell, cellIndex) => (
-        <td key={cellIndex}>{cell}</td>
+        <td key={cellIndex} style={{ maxWidth: '300px', wordWrap: 'break-word', whiteSpace: 'normal' }}>{cell}</td>
       ))}
     </tr>
   ));
 
   return (
-    <table>
+    <table style={{ tableLayout: 'fixed'}}>
       <thead>
         <tr>{headers}</tr>
       </thead>
@@ -64,8 +65,8 @@ function Callout(props) {
 function ProsCard({ title, pros }) {
   return (
     <div className="border border-emerald-200 dark:border-emerald-900 bg-neutral-50 dark:bg-neutral-900 rounded-xl p-6 my-4 w-full">
-      <span>{`You might use ${title} if...`}</span>
-      <div className="mt-4">
+      {title? <span>{`You might use ${title} if...`}</span> : null}
+      <div className={title? 'mt-4':''}>
         {pros.map((pro) => (
           <div key={pro} className="flex font-medium items-baseline mb-2">
             <div className="h-4 w-4 mr-2">

@@ -297,19 +297,8 @@ export default function Page() {
                 </span>
               </summary>
               <div className="px-3 py-4">
-                <p className="prose prose-neutral">
-                  Led the team's CI/CD works, Experienced in CI/CD
-                  methodologies,
-                  <LinkComponent href="https://ife.baidu.com/introduction.html">
-                    Kubernetes
-                  </LinkComponent>
-                  , Helm , Shell scripting, GitHub Actions, and{" "}
-                  <LinkComponent href="https://ife.baidu.com/introduction.html">
-                    Pulumi.
-                  </LinkComponent>
-                </p>
-                <p className="prose prose-neutral">
-                  Specializing in front-end performance optimization. Developed
+                <p className="prose prose-neutral mb-2">
+                  1. Specializing in front-end performance optimization. Developed
                   <LinkComponent href="https://ife.baidu.com/introduction.html">
                     monitoring and optimization tools{" "}
                   </LinkComponent>
@@ -319,12 +308,22 @@ export default function Page() {
                   </LinkComponent>
                   Products, serving tens of millions of users.
                 </p>
-                <p className="prose prose-neutral">
-                  Led Team's front-end testing strategy, provided comprehensive
-                  E2E test and{" "}
-                  <LinkComponent href="https://www.tencentcloud.com/">
-                    Cypress automation tool.
+                <p className="prose prose-neutral mb-2">
+                  2. Led the team's CI/CD works, Experienced in CI/CD
+                  methodologies,
+                  <LinkComponent href="https://ife.baidu.com/introduction.html">
+                    Kubernetes
                   </LinkComponent>
+                  , Helm , Shell scripting, GitHub Actions, and{" "}
+                  <LinkComponent href="https://ife.baidu.com/introduction.html">
+                    Pulumi.
+                  </LinkComponent>
+                </p>
+                <p className="prose prose-neutral mb-2">
+                3. <LinkComponent href="https://www.tencentcloud.com/">
+                  Monorepo
+                  </LinkComponent> & Micro Front-End Architecture: Integrated SPA applications into one Tencent's Cloud System, facilitating seamless collaboration across diverse domains .
+                
                 </p>
               </div>
             </details>
@@ -349,7 +348,7 @@ export default function Page() {
               </summary>
               <div className="px-3 py-4">
                 <p className="prose prose-neutral">
-                  Proficient in Node.js, with experience in Koa, Express, and
+                  Proficient in Node.js, with experience in Next.js, Koa, Express, and
                   NestJS
                 </p>
               </div>
@@ -371,14 +370,14 @@ export default function Page() {
               <img alt="GitHub logo" src="/Frame6.svg" width="120" />
             </a>
           </div>
-          <div className="flex items-center justify-between rounded border border-neutral-200 bg-neutral-50 px-3 py-4">
+          {/* <div className="flex items-center justify-between rounded border border-neutral-200 bg-neutral-50 px-3 py-4">
             <a href="https://supabase.com">
               <img alt="GitHub logo" src="/Frame7.svg" width="100" />
             </a>
-          </div>
+          </div> */}
           <div className="flex items-center justify-between rounded border border-neutral-200 bg-neutral-50 px-3 py-4">
             <a href="https://linear.app">
-              <img alt="GitHub logo" src="/Frame8.svg" width="170" />
+              <img alt="GitHub logo" src="/Frame11.svg" width="150" />
             </a>
           </div>
          <div className="flex items-center justify-between rounded border border-neutral-200 bg-neutral-50 px-3 py-4">
@@ -407,23 +406,23 @@ export default function Page() {
             slug="performance"
           />
           <BlogLink
-            name="Mastering CI/CD: A Beginner’s Guide to K8s Resource Management"
-            subName={"Understand Kubernetes: Launch Your First Application"}
-            slug="beginner-guide-k8s"
-          />
-          <BlogLink
             name="Uni-Code: Leveraging Monorepo for Enhanced Collaboration and Efficiency"
             subName={
               "Streamlining Your Team's Development Processes"
             }
-            slug="developer-experience-examples"
+            slug="uni-code"
           />
-                    <BlogLink
+          <BlogLink
             name="Unveiling React: A Deep Dive into the Principles"
             subName={
               "Building Your Own React Framework"
             }
-            slug="developer-experience-examples"
+            slug="mini-react-1"
+          />
+           <BlogLink
+            name="Mastering CI/CD: A Beginner’s Guide to K8s Resource Management"
+            subName={"Understand Kubernetes: Launch Your First Application"}
+            slug="beginner-guide-k8s"
           />
         </div>
       </div>
