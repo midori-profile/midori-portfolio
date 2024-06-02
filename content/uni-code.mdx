@@ -252,288 +252,17 @@ Chalk 是一个 Node.js 库，它可以在命令行中给文本添加颜色和�
 ```
 
 
-2.3 package.json 配置
-以下是介绍 Monorepo 中的 package.json 配置：
+## Introduction
 
-```markdown
-# Monorepo package.json Configuration
+In this guide, we will cover how to configure and package shared modules and application projects in a Monorepo. We'll start with shared modules and then move on to an example application, such as a React project. 
 
-```json
-{
-    // Package name (example: import {} from 'your-lib')
-    "name": "your-lib",
-    "version": "1.0.0",
-    "description": "A brief description of your package",
-    // Files to include in the published package; different from `.npmignore` blacklist, `files` is a whitelist
-    "files": ["dist", "es", "lib"],
-    // Security measure to prevent accidental publication to npm
-    "private": true,
-    /**
-     * Package dependencies
-     */
-    // Runtime dependencies, which will be installed by the package consumers
-    "dependencies": {
-        "lodash": "^4.17.21",
-        // ❌ "webpack": "^5.0.0",
-        // ❌ "react": "^17.0.0" Not recommended to include React in dependencies
-    },
-    "peerDependencies": {
-       "react": "^16.0.0 || ^17.0.0",
-       "react-dom": "^16.0.0 || ^17.0.0"
-    },
-    // Development dependencies, used only by package developers
-    "devDependencies": {
-        "rollup": "^2.60.2",
-        "eslint": "^8.5.0",
-        "react": "^16.0.0",
-        "react-dom": "^16.0.0"
-    }
-}
-```
+### 1. Shared Modules
 
-## Dependencies
+#### 1.1 Packaging Cross-Platform Utilities
 
-### dependencies
-These are the runtime dependencies that will be installed by the package consumers. Common mistakes include:
+When packaging cross-platform utilities, it’s important to support both CommonJS (CJS) and ES Modules (ESM). We’ll use `tsup` for its ease of use and speed.
 
-- **Incorrect**: Adding build tools or framework dependencies like webpack or React in dependencies, as this can lead to issues such as multiple instances of React in the consumer's project.
-  - ❌ `"webpack": "^5.0.0"`: The consumer will install webpack, which is unnecessary unless your module is tightly coupled with webpack functionality.
-  - ❌ `"react": "^17.0.0"`: Consumers installing React might face issues with multiple React instances.
-
-### devDependencies
-These are development dependencies, used only by the package developers. They are not installed by the consumers.
-
-- **Correct**: Adding build tools, linters, and other development utilities.
-  - ✅ `"rollup": "^2.60.2"`
-  - ✅ `"webpack": "^5.0.0"`
-  - ✅ `"react": "^17.0.0"`
-
-### peerDependencies
-These are host dependencies, indicating that the consumer must install these dependencies before using your package. There is some controversy around this setting because, from npm 7 onwards, peer dependencies are automatically installed by default, whereas pnpm and yarn do not.
-
-- **Correct**: Specifying necessary dependencies that should be installed by the consumer to avoid conflicts.
-  - ✅ `"react": "^16.0.0 || ^17.0.0"`
-
-### private
-If the package should not be published to npm, set this to true to prevent accidental publication, enhancing security.
-
-- **Correct**: Ensuring internal packages or applications within a monorepo are marked as private to avoid unintentional publication.
-  - ✅ `"private": true"`
-
-
-## Monorepo Considerations
-
-仓内：通过 pmpn workspace 可以方便链接工作区工程，直接从代码层面依赖，而非必需使用包管理 / 跨仓库的依赖。无需进行版本管理
-
-
-When configuring package.json files in a Monorepo, consider the following additional aspects:
-
-1. **Workspace Configuration**: Use a package manager that supports workspaces (such as Yarn or PNPM) to manage dependencies across multiple projects efficiently.
-    - Example for `pnpm-workspace.yaml`:
-      ```yaml
-      packages:
-        - 'apps/*'
-        - 'shared/*'
-      ```
-
-2. **Shared Dependencies**: Define shared dependencies at the root level of the monorepo to ensure consistency and reduce duplication.
-    ```json
-    // Root package.json
-    {
-      "name": "monorepo",
-      "private": true,
-      "workspaces": [
-        "apps/*",
-        "shared/*"
-      ],
-      "dependencies": {
-        "react": "^17.0.0",
-        "react-dom": "^17.0.0"
-      },
-      "devDependencies": {
-        "eslint": "^8.5.0",
-        "prettier": "^2.3.2"
-      }
-    }
-    ```
-
-3. **Scripts**: Define common scripts at the root level to streamline development and CI/CD processes.
-    ```json
-    // Root package.json
-    {
-      "scripts": {
-        "build": "lerna run build",
-        "test": "lerna run test",
-        "lint": "eslint '*/**/*.{js,ts,tsx}'"
-      }
-    }
-    ```
-
-By following these guidelines, you can create a well-structured and maintainable Monorepo configuration that leverages shared dependencies and consistent tooling across your projects.
-
-
-这段内容主要讲的是如何在 `package.json` 文件中配置模块的入口和导出，以适应不同的模块格式和运行环境（如 CommonJS、ESM、浏览器环境等）。它介绍了如何使用 `main`、`module`、`browser`、`exports` 等字段来声明模块的入口文件，以及如何利用这些配置来优化包的使用体验和性能（如支持 Tree Shaking）。
-
-### 单入口配置
-
-对于单入口包，可以使用以下配置：
-
-```json
-{
-    // -----单入口----
-    // 入口文件（使用 cjs 规范）
-    "main": "lib/index.js",
-    // 入口文件（使用 esm 规范）
-    "module": "es/index.js",
-    // 包类型导出
-    "typings": "typings/index.d.ts",
-    // 浏览器入口
-    "browser": "dist/index.js",
-    "sideEffects": false
-}
-```
-
-#### 参数说明：
-- **main**: 指定 CommonJS 格式的入口文件，通常用于 Node.js 环境。
-- **module**: 指定 ECMAScript Modules (ESM) 格式的入口文件，通常用于现代 JavaScript 打包工具和浏览器环境。
-- **browser**: 指定在浏览器环境中使用的入口文件，通常配置成 UMD 格式（Universal Module Definition）。
-- **typings**: 指定 TypeScript 类型定义文件的路径。
-- **sideEffects**: 设置为 `false` 表示该包没有副作用，打包工具可以安全地进行 Tree Shaking。
-
-### 多入口配置
-
-对于多入口包，可以使用 `exports` 和 `browser` 字段来定义不同路径下的模块导出：
-
-```json
-{
-    // ----多入口---
-    "exports": {
-        "./react": {
-            "import": "dist/react/index.js",
-            "require": "dist/react/index.cjs"
-        },
-        "./vue": {
-            "import": "dist/vue/index.js",
-            "require": "dist/vue/index.cjs"
-        }
-    },
-    "browser": {
-        "./react": "dist/react/index.js",
-        "./vue": "dist/vue/index.js"
-    },
-    "sideEffects": false
-}
-```
-
-#### 参数说明：
-- **exports**: Node.js 提出的模块导出提案，允许定义不同环境下的模块路径。可以为每个模块路径指定 `import`（ESM）和 `require`（CJS）格式的文件。
-  - **import**: 指定 ESM 格式的文件路径，通常用于现代 JavaScript 环境。
-  - **require**: 指定 CJS 格式的文件路径，通常用于 Node.js 环境。
-- **browser**: 指定在浏览器环境中使用的入口文件路径。
-- **sideEffects**: 设置为 `false` 表示该包没有副作用，打包工具可以安全地进行 Tree Shaking。
-
-### 补充内容
-
-#### 使用 `exports` 和 `imports` 字段的优点
-- **模块分发优化**：可以为不同的环境（如 Node.js、浏览器）提供不同的入口文件，提高模块加载性能。
-- **减少包体积**：通过配置 `sideEffects: false`，告知打包工具可以进行 Tree Shaking，删除未使用的代码，减少最终包的体积。
-- **提高兼容性**：能够为不同的模块系统（如 ESM 和 CJS）提供兼容的入口文件，确保模块在各种环境下都能正常使用。
-
-#### 示例：配置 TypeScript 项目
-如果你的项目使用 TypeScript，还可以添加 TypeScript 配置，以确保类型定义文件被正确导出和使用：
-
-```json
-{
-    // -----单入口----
-    "main": "lib/index.js",
-    "module": "es/index.js",
-    "typings": "dist/index.d.ts",
-    "browser": "dist/index.js",
-    "sideEffects": false,
-    "scripts": {
-        "build": "tsc && rollup -c",
-        "test": "jest"
-    },
-    "devDependencies": {
-        "typescript": "^4.3.5",
-        "rollup": "^2.60.2",
-        "jest": "^27.0.6"
-    }
-}
-```
-
-
-在这个配置中，`typings` 指向编译后的 TypeScript 类型定义文件路径，`scripts` 定义了构建和测试脚本，`devDependencies` 则包含了开发所需的依赖。
-
-通过合理配置 `package.json`，可以确保你的模块在不同环境下高效、可靠地运行，并且方便消费者使用和开发者维护。
-
-有了 package.json 配置以及 模块结构，下面介绍一下模块包的设计
-
-共享配置模块（shared）
-如果我们希望在所有的应用中使用这个包，在应用的 package.json 中
-项目中声明模块的依赖，workspace:* 表示使用当前 Monorepo 的 shared 模块包
-
-
-```
-// apps/*/package.json
-{
-  "dependencies": {
-     "@infras/shared": "workspace:*"
-  }
-}
-```
-在项目中使用 import 引 esm 格式、require 引 cjs 格式、常用的项目配置 tsconfig.json
-```
-// apps/*/index.{ts,tsx,jsx}
-import { AppType } from '@infras/shared/types';
-import { sum } from '@infras/shared/utils';
-
-console.log(AppType.Web); // 1
-console.log(sum(1, 1));   // 2
-
-// apps/*/index.js
-const { AppType } = require('@infras/shared/types');
-const { sum } = require('@infras/shared/utils');
-```
-这里是示例如何写一个共享配置模块
-```
-// apps/*/tsconfig.json
-{
- "extends": "@infras/shared/configs/tsconfig.base.json"
-}
-```
-以下是对构建 ESM 和 CJS 格式的包以及相关配置的详细介绍，并补充了一些内容：
-
-
-## 构建 ESM 和 CJS 格式的包
-
-为了确保使用方可以按需使用 ESM 和 CJS 格式的包，我们需要选择合适的编译和打包工具。下面是相关工具的选择和配置说明。
-
-### 构建工具选择
-
-#### 编译工具（Transformers）
-- **BabelJS**: 一个强大的 JavaScript 编译器。
-- **TypeScript (tsc)**: TypeScript 的编译器，用于将 TypeScript 转换为 JavaScript。
-- **Esbuild**: 一个超快的 JavaScript 和 TypeScript 编译器和打包器。
-
-#### 打包工具（Bundlers）
-- **Rollup**: 专注于构建小而高效的包，支持 tree-shaking。
-- **Esbuild**: 速度极快的编译和打包工具。
-- **Webpack**: 功能强大的打包工具，适合大型项目。
-- **Tsup**: 开箱即用的 TypeScript 构建工具，支持 ESM 和 CJS 格式。
-- **Unbuild**: 专注于构建和发布 TypeScript 包的工具。
-
-### 工具选择理由
-
-在实际项目中，我们选择 **Tsup** 作为构建工具，原因如下：
-- **快速和方便**: Tsup 提供开箱即用的体验，配置简单。
-- **支持多格式输出**: 可以同时输出 ESM 和 CJS 格式的包。
-- **类型支持**: Tsup 可以生成 TypeScript 类型定义文件。
-- **性能**: 编译和打包速度快。
-
-### Tsup 配置示例
-
-以下是 `tsup.config.ts` 的配置示例，用于构建 ESM 和 CJS 格式的包：
+**Tsup Configuration Example:**
 
 ```typescript
 // packages/shared/tsup.config.ts
@@ -548,99 +277,25 @@ export default defineConfig({
 });
 ```
 
-执行 `tsup` 后，会生成 `dist` 目录，结构如下：
-
-```
-# packages/shared
-- dist
-  - utils
-    - index.js (CJS)
-    - index.mjs (ESM)
-  - types
-    - index.js (CJS)
-    - index.mjs (ESM)
-- utils
-- types
-- package.json
-```
-
-**注**: 将多入口 `utils` 和 `types` 目录放在 `src` 目录外是为了在 Monorepo 项目中有更好的 TypeScript 类型支持。实际使用时，将类型提示指向源文件（如 `index.ts`），而真正使用的是 `dist` 目录中的产物。
-
-### package.json 配置
-
-对于通用模块包的 `package.json` 配置如下，使用 `exports` 和 `browser` 组合导出 CJS 和 ESM 格式的包：
-
-```json
-// packages/shared/package.json
-{
-  "name": "@infras/shared",
-  "version": "0.0.1",
-  "description": "An infrastructure monorepo shared library for all projects and apps.",
-  "browser": {
-    "./types": "./dist/types/index.mjs",
-    "./utils": "./dist/utils/index.mjs"
-  },
-  "exports": {
-    "./types": {
-      "import": "./dist/types/index.mjs",
-      "require": "./dist/types/index.js"
-    },
-    "./utils": {
-      "import": "./dist/utils/index.mjs",
-      "require": "./dist/utils/index.js"
-    }
-  },
-  "scripts": {
-    "prepare": "npm run build",
-    "dev": "tsup --watch",
-    "build": "tsup"
-  },
-  "devDependencies": {
-    "tsup": "^5.10.3"
-  }
-}
-```
-
-### 参数说明
-
-- **main**: 指定 CommonJS 格式的入口文件，通常用于 Node.js 环境。
-- **module**: 指定 ECMAScript Modules (ESM) 格式的入口文件，通常用于现代 JavaScript 打包工具和浏览器环境。
-- **browser**: 指定在浏览器环境中使用的入口文件，通常配置成 UMD 格式。
-- **typings**: 指定 TypeScript 类型定义文件的路径。
-- **sideEffects**: 设置为 `false` 表示该包没有副作用，打包工具可以安全地进行 Tree Shaking。
-- **exports**: 定义模块导出的路径，支持不同环境（Node.js、浏览器等）下使用不同格式（ESM、CJS）的包。
-- **scripts**: 定义构建和开发的命令脚本，方便使用 npm 执行。
-- **devDependencies**: 开发时依赖，使用方不会安装这些依赖，只为包开发者服务。
-
-### `scripts.prepare`
-
-将 `prepare` 构建脚本加入 `scripts` 中，可以确保在以下时机执行：
-- 发布前编译（相当于 `prepublishOnly`）。
-- 本地 `npm install` 时执行（不同于 `postinstall` 在任何时候 `install` 都会执行，会造成消费者安装时 tsup 依赖不存在报错）。
-
-### 示例配置
+**package.json Configuration for Utilities:**
 
 ```json
 {
   "name": "@infras/shared",
   "version": "0.0.1",
-  "description": "An infrastructure monorepo shared library for all projects and apps.",
-  "main": "lib/index.js",
-  "module": "es/index.js",
-  "browser": {
-    "./types": "./dist/types/index.mjs",
-    "./utils": "./dist/utils/index.mjs"
-  },
+  "description": "Shared utilities for all projects and apps.",
   "exports": {
-    "./types": {
-      "import": "./dist/types/index.mjs",
-      "require": "./dist/types/index.js"
-    },
     "./utils": {
       "import": "./dist/utils/index.mjs",
       "require": "./dist/utils/index.js"
+    },
+    "./types": {
+      "import": "./dist/types/index.mjs",
+      "require": "./dist/types/index.js"
     }
   },
+  "main": "dist/index.js",
+  "module": "dist/index.mjs",
   "typings": "dist/index.d.ts",
   "sideEffects": false,
   "scripts": {
@@ -654,8 +309,154 @@ export default defineConfig({
 }
 ```
 
-通过这种方式配置 `package.json` 文件和构建工具，可以确保你的包在不同环境中高效、可靠地运行，并且方便消费者使用和开发者维护。如果有更多的具体需求或问题，可以进一步扩展和自定义这些配置。
+#### 1.2 Packaging a UI Component Library
 
+For a UI component library, the packaging process is similar to utilities. We need to support both CJS and ESM formats and ensure TypeScript definitions are included.
+
+**Tsup Configuration for UI Components:**
+
+```typescript
+// packages/ui/tsup.config.ts
+import { defineConfig } from 'tsup';
+
+export default defineConfig({
+  entry: ['components/index.ts'],
+  clean: true,
+  dts: true,
+  outDir: 'dist',
+  format: ['cjs', 'esm']
+});
+```
+
+**package.json Configuration for UI Components:**
+
+```json
+{
+  "name": "@infras/ui",
+  "version": "0.0.1",
+  "description": "UI component library for all projects and apps.",
+  "exports": {
+    "./components": {
+      "import": "./dist/components/index.mjs",
+      "require": "./dist/components/index.js"
+    }
+  },
+  "main": "dist/index.js",
+  "module": "dist/index.mjs",
+  "typings": "dist/index.d.ts",
+  "sideEffects": false,
+  "scripts": {
+    "prepare": "npm run build",
+    "dev": "tsup --watch",
+    "build": "tsup"
+  },
+  "devDependencies": {
+    "tsup": "^5.10.3"
+  }
+}
+```
+
+### 2. Application Example: React Project
+
+#### 2.1 Packaging and Configuring package.json
+
+For the application, such as a React project, we'll configure the `package.json` to include the necessary dependencies and scripts.
+
+**package.json Configuration:**
+
+```json
+{
+  "name": "react-app",
+  "version": "1.0.0",
+  "private": true,
+  "dependencies": {
+    "react": "^17.0.0",
+    "react-dom": "^17.0.0",
+    "@infras/shared": "workspace:*",
+    "@infras/ui": "workspace:*"
+  },
+  "scripts": {
+    "start": "react-scripts start",
+    "build": "react-scripts build",
+    "test": "react-scripts test",
+    "eject": "react-scripts eject"
+  },
+  "devDependencies": {
+    "react-scripts": "^4.0.3"
+  }
+}
+```
+
+#### 2.2 Importing Shared Packages
+
+In the React application, you can import the shared utilities and UI components as follows:
+
+**Example Usage in React Project:**
+
+```javascript
+// src/index.tsx
+import React from 'react';
+import ReactDOM from 'react-dom';
+import { AppType } from '@infras/shared/types';
+import { sum } from '@infras/shared/utils';
+import { Button } from '@infras/ui/components';
+
+const App = () => (
+  <div>
+    <h1>App Type: {AppType.Web}</h1>
+    <p>Sum: {sum(1, 2)}</p>
+    <Button>Click Me</Button>
+  </div>
+);
+
+ReactDOM.render(<App />, document.getElementById('root'));
+```
+
+### Monorepo Considerations
+
+**Workspace Configuration:**
+
+Use a package manager that supports workspaces, like PNPM, to manage dependencies efficiently.
+
+**Example pnpm-workspace.yaml:**
+
+```yaml
+packages:
+  - 'apps/*'
+  - 'packages/*'
+```
+
+**Shared Dependencies:**
+
+Define shared dependencies at the root level to ensure consistency and reduce duplication.
+
+**Root package.json:**
+
+```json
+{
+  "name": "monorepo",
+  "private": true,
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "dependencies": {
+    "react": "^17.0.0",
+    "react-dom": "^17.0.0"
+  },
+  "devDependencies": {
+    "eslint": "^8.5.0",
+    "prettier": "^2.3.2"
+  },
+  "scripts": {
+    "build": "lerna run build",
+    "test": "lerna run test",
+    "lint": "eslint '*/**/*.{js,ts,tsx}'"
+  }
+}
+```
+
+By following these guidelines, you can create a well-structured and maintainable Monorepo configuration that leverages shared dependencies and consistent tooling across your projects.
 运行：
 
 pnpm start --filter "react-app"

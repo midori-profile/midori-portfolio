@@ -1,4 +1,4 @@
-lockfileVersion: '6.1'
+lockfileVersion: '6.0'
 
 settings:
   autoInstallPeers: true
@@ -60,8 +60,8 @@ dependencies:
     specifier: 18.2.0
     version: 18.2.0(react@18.2.0)
   react-tweet:
-    specifier: 3.2.0
-    version: 3.2.0(react-dom@18.2.0)(react@18.2.0)
+    specifier: 3.2.1
+    version: 3.2.1(react-dom@18.2.0)(react@18.2.0)
   remote-mdx:
     specifier: ^0.0.4
     version: 0.0.4(react@18.2.0)
@@ -96,13 +96,6 @@ packages:
       oauth4webapi: 2.10.4
       preact: 10.11.3
       preact-render-to-string: 5.2.3(preact@10.11.3)
-    dev: false
-
-  /@babel/runtime@7.24.1:
-    resolution: {integrity: sha512-+BIznRzyqBf+2wCTxcKE3wDjfGeCoVE61KSHGpkzqrLi8qxqFwBeUFyId2cxkTmm55fzDGnm0+yCxaxygrLUnQ==}
-    engines: {node: '>=6.9.0'}
-    dependencies:
-      regenerator-runtime: 0.14.1
     dev: false
 
   /@codemirror/autocomplete@6.15.0(@codemirror/language@6.10.1)(@codemirror/state@6.4.1)(@codemirror/view@6.26.1)(@lezer/common@1.2.1):
@@ -939,13 +932,6 @@ packages:
     dependencies:
       es5-ext: 0.10.64
       type: 2.7.2
-    dev: false
-
-  /date-fns@2.30.0:
-    resolution: {integrity: sha512-fnULvOpxnC5/Vg3NCiWelDsLiUc9bRwAPs/+LfTLNvetFCtCTN+yQz15C/fs4AwX1R9K5GLtLfn8QW+dWisaAw==}
-    engines: {node: '>=0.11'}
-    dependencies:
-      '@babel/runtime': 7.24.1
     dev: false
 
   /debug@4.3.4:
@@ -2324,15 +2310,14 @@ packages:
     resolution: {integrity: sha512-w2GsyukL62IJnlaff/nRegPQR94C/XXamvMWmSHRJ4y7Ts/4ocGRmTHvOs8PSE6pB3dWOrD/nueuU5sduBsQ4w==}
     dev: false
 
-  /react-tweet@3.2.0(react-dom@18.2.0)(react@18.2.0):
-    resolution: {integrity: sha512-eYLAX5ViOICQT/vkte/IzYZZDoBnl7hDO3Ns4++lKEFr/+BohPK5Rg+Lvbfx78Qtn3AjfDG5c6n+rOt7c2J6qg==}
+  /react-tweet@3.2.1(react-dom@18.2.0)(react@18.2.0):
+    resolution: {integrity: sha512-dktP3RMuwRB4pnSDocKpSsW5Hq1IXRW6fONkHhxT5EBIXsKZzdQuI70qtub1XN2dtZdkJWWxfBm/Q+kN+vRYFA==}
     peerDependencies:
       react: '>= 18.0.0'
       react-dom: '>= 18.0.0'
     dependencies:
       '@swc/helpers': 0.5.8
       clsx: 2.1.0
-      date-fns: 2.30.0
       react: 18.2.0
       react-dom: 18.2.0(react@18.2.0)
       swr: 2.2.5(react@18.2.0)
@@ -2356,10 +2341,6 @@ packages:
     engines: {node: '>=8.10.0'}
     dependencies:
       picomatch: 2.3.1
-    dev: false
-
-  /regenerator-runtime@0.14.1:
-    resolution: {integrity: sha512-dYnhHh0nJoMfnkZs6GmmhFknAGRrLznOu5nc9ML+EJxGvrx6H7teuevqVqCuPcPK//3eDrrjQhehXVx9cnkGdw==}
     dev: false
 
   /remark-mdx@2.3.0:
