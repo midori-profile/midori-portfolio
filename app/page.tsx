@@ -13,6 +13,7 @@ import avatar from "app/avatar.jpg";
 import avatarPortfolio from "app/avatar-portfolio.jpg";
 import ViewCounter from "app/blog/view-counter";
 import { PreloadResources } from "app/preload";
+import TweetComponent from './components/tweet';
 import Accordion from "./accordiont";
 import {
   getLeeYouTubeSubs,
@@ -391,6 +392,7 @@ export default function Page() {
           </div>
         </div>
       </div>
+
       <div className="pt-6">
         <h2 className="font-medium text-xl mb-1 tracking-tighter">
           III. My Technique Posts
@@ -402,7 +404,7 @@ export default function Page() {
         <div className="my-4 flex w-full flex-col space-y-4">
           <BlogLink
             name="Tencent Cloud Mini-App Performance Optimization Practices"
-            subName={" How to Reduce Startup Time by 60%"}
+            subName={"How to Reduce Loading Time by 65%"}
             slug="performance"
           />
           <BlogLink
@@ -413,11 +415,11 @@ export default function Page() {
             slug="uni-code"
           />
           <BlogLink
-            name="Unveiling React: A Deep Dive into the Principles"
+            name="How to Achieve High-Performance Web Animations"
             subName={
-              "Building Your Own React Framework"
+              "A Zero-Cost Solution Impacting Billions of Page Views"
             }
-            slug="mini-react-1"
+            slug="web-animation"
           />
            <BlogLink
             name="Mastering CI/CD: A Beginner’s Guide to K8s Resource Management"
