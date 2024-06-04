@@ -1,6 +1,7 @@
 import { Suspense } from "react";
 import { unstable_noStore as noStore } from "next/cache";
 import Link from "next/link";
+import { Callout } from "./components/mdx";
 import Image, { StaticImageData } from "next/image";
 import smashing from "public/images/home/smashing.jpg";
 import summit from "public/images/home/summit.jpg";
@@ -91,9 +92,6 @@ function ChannelLink({
           <div className="flex flex-col">
             <p className="font-medium prose prose-neutral">{name}</p>
 
-            {/* <p className="font-bold text-neutral-900 dark:text-neutral-100">
-              {name}
-            </p> */}
             <Suspense fallback={<p className="h-6" />}>
               <Subs name={name} />
             </Suspense>
@@ -110,7 +108,6 @@ function ChannelLink({
 async function getMidoriFollowers() {
   // FIXME: {"message":"API rate limit exceeded for 185.212.61.32. (But here's the good news: Authenticated requests get a higher rate limit. Check out the documentation for more details.)","documentation_url":"https://docs.github.com/rest/overview/resources-in-the-rest-api#rate-limiting"}
   const response = await fetch("https://api.github.com/users/midori-profile");
-  console.log("response: ", response);
   const data = await response.json();
   return data.followers;
 }
@@ -121,7 +118,6 @@ async function Subs({ name }: { name: string }) {
   if (name === "@Midori") {
     // Replace this with the actual function to get @Midori's followers
     counts = await getMidoriFollowers();
-    console.log("counts: ", counts);
   } else if (name === "Professional Experience") {
     // Replace this with the actual function to get the total article views
     // counts = await getTotalArticleViews();
@@ -131,7 +127,7 @@ async function Subs({ name }: { name: string }) {
 
   return (
     <p className="prose prose-neutral pl-1">
-      {counts} {name === "Professional Experience" ? "views" : "followers"}
+      {counts} {name === "Professional Experience" ? "Online Resume" : "followers"}
     </p>
   );
 }
@@ -148,7 +144,7 @@ function BlogLink({ slug, name, subName }) {
           <Suspense fallback={<p className="h-6" />}>
             <div className="flex flex-col sm:flex-row">
               <p className="prose prose-neutral pr-2">{subName}</p>
-              <Views slug={slug} />
+              <div style={{paddingTop: 2, marginLeft: 2}}><Views slug={slug} /></div>
             </div>
           </Suspense>
         </div>
@@ -176,7 +172,7 @@ export const LinkComponent: React.FC<LinkComponentProps> = ({
 }) => (
   <span>
     {" "}
-    <a href={href} className="underline text-black hover:text-gray-800">
+    <a target="_blank" href={href} className="underline text-black hover:text-gray-800">
       {children}
     </a>{" "}
   </span>
@@ -186,15 +182,15 @@ export default function Page() {
   return (
     <section>
       <PreloadResources />
-      <div className="flex flex-col sm:flex-row w-full items-end sm:items-center">
-        <h1 className="text-2xl font-medium tracking-tighter">
+      <div className="flex flex-col md:flex-row w-full">
+        <h1 className="text-2xl font-medium tracking-tighter mr-6">
           Hi 👋, I'm Midori.{" "}
         </h1>
         <a
-          className="ml-6 flex items-center transition-all hover:text-neutral-800 dark:hover:text-neutral-100"
+          className="flex items-center transition-all hover:text-neutral-800"
           rel="noopener noreferrer"
           target="_blank"
-          href="https://leerob.substack.com"
+          href="mailto:ceadatian@gmail.com"
         >
           <ArrowIcon />
           <p className="ml-2 pt-0.5"> Send me email</p>
@@ -222,7 +218,7 @@ export default function Page() {
           I. Technical Highlights
         </h2>
         <p className="prose prose-neutral">
-          {`I've outlined some of my key technical strengths, which are divided into three main categories, click to show details`}
+          {`I've outlined some of my main technical strengths, which are divided into three categories, click to show details`}
         </p>
         <div className="my-4 max-w-screen-xl mx-auto min-h-sceen w-full border border-neutral-200">
           <div className="divide-y divide-neutral-200 mx-auto">
@@ -251,17 +247,17 @@ export default function Page() {
                 <p className="prose prose-neutral">
                   Expert in large-scale front-end frameworks, such as Vue and
                   React , Had
-                  <LinkComponent href="https://en.wikipedia.org/wiki/Tencent">
+                  <LinkComponent href="/blog/mini-react-1">
                     deep dive into React's source code
                   </LinkComponent>
                 </p>
                 <p className="prose prose-neutral">
-                  Designed and developed the
-                  <LinkComponent href="https://en.wikipedia.org/wiki/Tencent">
+                  Developed the
+                  <LinkComponent href="https://smartprogram.baidu.com/docs/develop/tutorial/intro/">
                     Baidu Mini-App framework
                   </LinkComponent>
-                  , serving 300k mini-program merchants, obtained
-                  <LinkComponent href="https://en.wikipedia.org/wiki/Tencent">
+                  , serving 300,000 mini-program merchants, obtained
+                  <LinkComponent href="https://pss-system.cponline.cnipa.gov.cn/documents/detail?prevPageTit=changgui">
                     2 technical patents.
                   </LinkComponent>
                 </p>
@@ -271,7 +267,7 @@ export default function Page() {
                   <LinkComponent href="https://ife.baidu.com/introduction.html">
                     Baidu Front End Academy
                   </LinkComponent>
-                  , delivering Javascript/Typescript courses to over 60k college
+                  , delivering Javascript/Typescript courses to over 60,000 college
                   students.
                 </p>
               </div>
@@ -299,9 +295,9 @@ export default function Page() {
               </summary>
               <div className="px-3 py-4">
                 <p className="prose prose-neutral mb-2">
-                  1. Specializing in front-end performance optimization. Developed
-                  <LinkComponent href="https://ife.baidu.com/introduction.html">
-                    monitoring and optimization tools{" "}
+                  1. Specializing in performance optimization. Implemented a complete 
+                  <LinkComponent href="/blog/performance">
+                    monitoring and optimization system{" "}
                   </LinkComponent>
                   for{" "}
                   <LinkComponent href="https://www.tencentcloud.com/">
@@ -311,20 +307,15 @@ export default function Page() {
                 </p>
                 <p className="prose prose-neutral mb-2">
                   2. Led the team's CI/CD works, Experienced in CI/CD
-                  methodologies,
-                  <LinkComponent href="https://ife.baidu.com/introduction.html">
-                    Kubernetes
-                  </LinkComponent>
-                  , Helm , Shell scripting, GitHub Actions, and{" "}
+                  methodologies, Kubernetes, Helm , Shell scripting, GitHub Actions, and{" "}
                   <LinkComponent href="https://ife.baidu.com/introduction.html">
                     Pulumi.
                   </LinkComponent>
                 </p>
                 <p className="prose prose-neutral mb-2">
-                3. <LinkComponent href="https://www.tencentcloud.com/">
-                  Monorepo
-                  </LinkComponent> & Micro Front-End Architecture: Integrated SPA applications into one Tencent's Cloud System, facilitating seamless collaboration across diverse domains .
-                
+                3. Expert in <LinkComponent href="/blog/uni-code">
+                  Monorepo & Micro Front-End Architecture:
+                  </LinkComponent> Have Integrated multiple SPAs into one Tencent's Cloud System, facilitating seamless collaboration across diverse domains.
                 </p>
               </div>
             </details>
@@ -366,27 +357,26 @@ export default function Page() {
           are some tools I've developed, give it a try!
         </p>
         <div className="my-4 flex flex-col sm:flex-row w-full space-y-2 sm:space-x-2 sm:space-y-0 overflow-x-auto">
-          <div className="flex items-center justify-between rounded border border-neutral-200 bg-neutral-50 px-3 py-4">
-            <a href="https://www.makeswift.com/blog/makeswift-is-joining-bigcommerce">
-              <img alt="GitHub logo" src="/Frame6.svg" width="120" />
-            </a>
-          </div>
           {/* <div className="flex items-center justify-between rounded border border-neutral-200 bg-neutral-50 px-3 py-4">
-            <a href="https://supabase.com">
-              <img alt="GitHub logo" src="/Frame7.svg" width="100" />
+            <a target="_blank" href="https://github.com/midori-profile/CyGen">
+              <img src="/cy-gen.svg" width="100" />
             </a>
           </div> */}
           <div className="flex items-center justify-between rounded border border-neutral-200 bg-neutral-50 px-3 py-4">
-            <a href="https://linear.app">
-              <img alt="GitHub logo" src="/Frame11.svg" width="150" />
+            <a target="_blank" href="https://github.com/midori-profile/overlay-video">
+              <img src="/overlay-vid.svg" width="120" />
+            </a>
+          </div>
+          <div className="flex items-center justify-between rounded border border-neutral-200 bg-neutral-50 px-3 py-4">
+            <a target="_blank" href="https://github.com/midori-profile/graphql-easy-mock">
+              <img src="/graph-ql.svg" width="140" />
             </a>
           </div>
          <div className="flex items-center justify-between rounded border border-neutral-200 bg-neutral-50 px-3 py-4">
-            <a href="https://www.makeswift.com/blog/makeswift-is-joining-bigcommerce">
+            <a target="_blank" href="https://github.com/midori-profile/code-seek">
               <img
-                alt="GitHub logo"
-                src="/Frame13.svg"
-                width="120"
+                src="/code-seek.svg"
+                width="115"
               />
             </a>
           </div>
@@ -399,7 +389,7 @@ export default function Page() {
         </h2>
         <p className="prose prose-neutral dark:prose-invert">
           I enjoy learning and sharing. Below are some of my past works and
-          shares (confidential content removed).
+          contributions (confidential content removed).
         </p>
         <div className="my-4 flex w-full flex-col space-y-4">
           <BlogLink
@@ -417,7 +407,7 @@ export default function Page() {
           <BlogLink
             name="How to Achieve High-Performance Web Animations"
             subName={
-              "A Zero-Cost Solution Impacting Billions of Page Views"
+              "A Zero-Cost Solution Proven by Billions of Page Views"
             }
             slug="web-animation"
           />
@@ -438,15 +428,15 @@ export default function Page() {
         <div className="prose prose-neutral my-4">
           <ul className="list-disc list-inside space-y-2">
             <li>
-              <span>Chinese -- </span>
-              <span>Native Speaker</span>
-            </li>
-            <li>
               <span>English -- </span>
               <span>
                 IELTS score of 7. Worked in English-speaking environments for
                 years.
               </span>
+            </li>
+            <li>
+              <span>Chinese -- </span>
+              <span>Native Speaker</span>
             </li>
             <li>
               <span>Japanese -- </span>
@@ -456,12 +446,23 @@ export default function Page() {
         </div>
       </div>
       <div className="pt-6">
+        <h2 className="font-medium text-xl mb-2 tracking-tighter">
+          V. Education
+        </h2>
+        <Callout emoji="🧑‍🎓">
+          <LinkComponent href="https://en.wikipedia.org/wiki/Huazhong_University_of_Science_and_Technology">
+              <b>Huazhong University of Science and Technology</b>
+          </LinkComponent>
+          <p>Bachelor of Optical Information Science and Engineering</p>
+        </Callout>
+      </div>
+      <div className="pt-6">
         <h2 className="font-medium text-xl mb-1 tracking-tighter">
-          V. Some Interesting Things
+          VI. Some Interesting Things
         </h2>
         <p className="prose prose-neutral">
           Besides programming, I also served as a designer for
-          <LinkComponent href="https://en.wikipedia.org/wiki/Tencent">
+          <LinkComponent href="https://echarts.apache.org/en/index.html">
             Echarts
           </LinkComponent>
           team for two years. I enjoy photography and design a lot. Check some
@@ -474,7 +475,7 @@ export default function Page() {
               className="flex items-center transition-all hover:text-neutral-800 dark:hover:text-neutral-100"
               rel="noopener noreferrer"
               target="_blank"
-              href="https://leerob.substack.com"
+              href="https://dribbble.com/midori123321"
             >
               <ArrowIcon />
               <p className="ml-2 h-7">View my design work</p>
@@ -485,7 +486,7 @@ export default function Page() {
               className="flex items-center transition-all hover:text-neutral-800 dark:hover:text-neutral-100"
               rel="noopener noreferrer"
               target="_blank"
-              href="https://leerob.substack.com"
+              href="https://www.instagram.com/ivymidori/?igsh=MXBlMjd4bmx3anR2eA%3D%3D"
             >
               <ArrowIcon />
               <p className="ml-2 h-7">My photography work</p>
