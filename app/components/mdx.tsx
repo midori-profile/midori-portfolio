@@ -50,6 +50,12 @@ function CustomLink(props) {
 }
 
 function RoundedImage(props) {
+  try {
+    new URL(props.src);
+  } catch (_) {
+    console.error(`Invalid URL in RoundedImage: ${props.src}`);
+    return null;
+  }
   return <Image alt={props.alt} className="rounded-lg" {...props} />;
 }
 

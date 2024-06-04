@@ -169,14 +169,23 @@ interface LinkComponentProps {
 export const LinkComponent: React.FC<LinkComponentProps> = ({
   href,
   children,
-}) => (
-  <span>
-    {" "}
-    <a target="_blank" href={href} className="underline text-black hover:text-gray-800">
-      {children}
-    </a>{" "}
-  </span>
-);
+}) => {
+  try {
+    new URL(href);
+  } catch (_) {
+    console.error(`Invalid URL in LinkComponent: ${href}`);
+    return null;
+  }
+
+  return (
+    <span>
+      {" "}
+      <a target="_blank" href={href} className="underline text-black hover:text-gray-800">
+        {children}
+      </a>{" "}
+    </span>
+  );
+};
 
 export default function Page() {
   return (
@@ -231,7 +240,7 @@ export default function Page() {
                   <svg
                     fill="none"
                     height="22"
-                    shape-rendering="geometricPrecision"
+                    shapeRendering="geometricPrecision"
                     stroke="currentColor"
                     stroke-linecap="round"
                     stroke-linejoin="round"
@@ -281,7 +290,7 @@ export default function Page() {
                   <svg
                     fill="none"
                     height="22"
-                    shape-rendering="geometricPrecision"
+                    shapeRendering="geometricPrecision"
                     stroke="currentColor"
                     stroke-linecap="round"
                     stroke-linejoin="round"
@@ -326,7 +335,7 @@ export default function Page() {
                   <svg
                     fill="none"
                     height="22"
-                    shape-rendering="geometricPrecision"
+                    shapeRendering="geometricPrecision"
                     stroke="currentColor"
                     stroke-linecap="round"
                     stroke-linejoin="round"
