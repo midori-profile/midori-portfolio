@@ -3,7 +3,6 @@ import { getGuestbookEntries } from "app/db/queries";
 import { SignIn, SignOut } from "./buttons";
 import { Suspense } from "react";
 import Form from "./form";
-import { ArrowIcon } from "app/page";
 
 export const metadata = {
   title: "Guestbook",
