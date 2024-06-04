@@ -23,7 +23,7 @@ export function Navbar() {
           className="flex flex-row items-start relative px-0 pb-0 fade md:overflow-auto scroll-pr-6 md:relative"
           id="nav"
         >
-          <div className="flex flex-row space-x-3 pr-10">
+          <div className="flex flex-row space-x-3">
             {Object.entries(navItems).map(([path, { name }]) => {
               return (
                 <div className="transition-all hover:bg-gray-100 rounded-full">
