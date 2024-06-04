@@ -6,9 +6,9 @@ summary: ''
 
 ## Introduction
 
-When you find yourself struggling to grasp React development skills quickly while studying the documentation, what better way to deeply understand React's core concepts than building a React yourself? 
+When you find yourself struggling to grasp React development skills from the documentation, there's no better way to deeply understand React's core concepts than by building your own version of React.
 
-In this article, I'll guide you step by step on how to build React from scratch, and you'll personally implement those core concepts of React from 2013 (`React 0.3`) to 2019 (`React 16.8`), gaining a profound understanding of their design principles and the trade-offs made during the evolution of technology.
+In this series, I'll guide you step by step on how to build React from scratch. You'll personally implement the core concepts of React from 2013 (React 0.3) to 2019 (React 16.8), gaining a profound understanding of its design principles and the trade-offs made during the evolution of the technology.
 
 
 ## Overview
@@ -19,7 +19,7 @@ This series will be divided into three articles, The features we'll implement in
 
 **Render:** Introduced in `React 0.13 (2015)`, the render function is used to render the virtual DOM to the real DOM.
 **JSX:** Also introduced in `React 0.13 (2015)`, JSX syntax provides a convenient way to write component structures and converts it into calls to the createElement function.
-**Props:** In `React 0.3 (2013)`, the functionality of passing props was introduced, allowing components to receive data from parent components.
+
 
 ## II: Enhanced Core Features
 
@@ -31,18 +31,20 @@ This series will be divided into three articles, The features we'll implement in
 
 **Diff Algorithm:** In `React 0.3 (2013)`, the diff algorithm based on virtual DOM was introduced, used to compare differences in virtual DOM to minimize DOM operations and improve performance.
 **Function Component:** In `React 16.8 (2019)`, Hooks were introduced, including useState and useEffect, as well as the implementation of function components.
-**useState:** Also introduced in `React 16.8 (2019)`, the useState hook allows function components to have their own state.
-**useEffect:** Also introduced in `React 16.8 (2019)`, the useEffect hook is used to handle component side effects such as data fetching and subscriptions.
+**useState:** Introduced in `React 16.8 (2019)`, the useState hook allows function components to have their own state.
+**useEffect:** Introduced in `React 16.8 (2019)`, the useEffect hook is used to handle component side effects such as data fetching and subscriptions.
 
-# let's dive into Basic Feature Implementation
+## let's dive into Basic Feature Implementation
 
-## Step Zero: render
 
-让我们一步步来创建一个简单的 React 渲染器，并逐步优化它。我们将从一个简单的 HTML 文件开始，然后逐步引入 React 的核心概念。
 
-### 1. 创建 HTML 文件
+## Step One: render
 
-首先，我们创建一个基本的 HTML 文件，其中包含一个根元素 div，并给它一个 id 为 "root"，以便我们将 React 元素渲染到这个元素中。
+Let's create a simple React renderer step by step and gradually optimize it. Firstly, We'll start with a basic HTML file and then progressively introduce React's core concepts.
+
+### 1. Create an HTML File
+
+First, let's create a basic HTML file that includes a root div element with an id of "root". This will be the element where we render our React components.
 
 ```
 <!-- index.html -->
@@ -60,16 +62,20 @@ This series will be divided into three articles, The features we'll implement in
 </body>
 </html>
 ```
-### 创建 createElement 函数
-我们从头开始实现 createElement 函数，这是一个用于创建 React 元素的函数。它接受三个参数：type（元素类型）、props（属性）和 children（子元素）。
+### 2. Create the createElement Function
+
+We'll start by implementing the createElement function from scratch. This function is used to create React elements. It accepts three parameters: type (the element type), props (the properties), and children (the child elements).
+
+Props is also introduced in `React 0.3 (2013)`,  it's an object containing all the attributes passed to the component. allowing components to receive data from parent components.
+
 ```
-// 创建 createElement 函数
+// Create the createElement function
 function createElement(type, props, ...children) {
   return {
-    type, // 元素类型
+    type, // Element type
     props: {
-      ...props, // 属性
-      children: children.map(child => // 子元素
+      ...props, // Properties
+      children: children.map(child =>
         typeof child === 'object'
           ? child
           : createTextElement(child)
@@ -79,10 +85,11 @@ function createElement(type, props, ...children) {
 }
 ```
 
-创建 createTextElement 函数
-我们还需要创建一个函数来创建文本节点元素。
+Create the createTextElement Function
+We also need a function to create text node elements.which is the createTextElement Function
+
 ```
-// 创建文本节点
+// Create a text node
 function createTextElement(text) {
   return {
     type: 'TEXT_ELEMENT',
@@ -94,10 +101,12 @@ function createTextElement(text) {
 }
 ```
 
-创建 render 函数
-现在，我们将编写一个简单的渲染函数，它将根据传入的 React 元素将内容渲染到容器中
+### 3. Create the render Function
+
+Next, we'll write a simple render function that will render content into a container based on the React element passed in.
+
 ```
-// 渲染函数
+// Render function
 function render(element, container) {
   const dom =
     element.type === 'TEXT_ELEMENT'
@@ -117,58 +126,96 @@ function render(element, container) {
 
   container.appendChild
 ```
- 创建根节点并渲染 React 元素
-最后，我们获取根节点并将创建的 React 元素渲染到根节点中。
+
+### 4.  Create the Root Node and Render the React Element
+
+Finally, we'll get the root node and render the created React element into the root node.
+
 ```
-// 创建根节点
+// Create the root node
 const root = document.getElementById('root');
 
-// 创建一个 React 元素
+// Create a React element
 const element = createElement('div', { id: 'app' }, 'Hello, world!');
 
-// 渲染 React 元素到根节点
+// Render the React element to the root node
 render(element, root);
 
 ```
-现在，我们已经成功地使用原生 JavaScript 实现了一个简单的 React 渲染器，能够将包含文本内容的 div 元素渲染到页面上。
+Now, we have successfully implemented a simple React renderer using vanilla JavaScript that can render a div element containing text to the page.
 
-## Step one: JSX
+## Step Two: JSX
 
-这样我们就已经完成了简单的mini-react,但是，我们毕竟是用js来实现的，但是一般我们是使用jsx啊，那怎么办呢？后面我们就来实现jsx的版本
+With the code above, we have completed a simple mini-react renderer. However, we usually use JSX to simplify the creation of React elements. 
 
-这里我们想使用JSX的话，我们需要借助一些库，例如webpack、bable、vite都行，这里的话，我们采用vite去实现 （这些库主要是在做什么）
+JSX is a syntax extension that looks similar to HTML and allows us to write XML-like code inside JavaScript. Since browsers can't understand JSX directly, we need to transform it into pure JavaScript code. 
 
-JSX 编译：JSX 是一种类似于 HTML 的语法扩展，在 JavaScript 中嵌入了 XML 标签。但是，浏览器无法直接理解 JSX，因此需要将 JSX 转换为纯 JavaScript 代码。这就是这些工具的主要作用之一。
-模块打包：除了 JSX 编译外，这些工具还负责将项目中的各个模块打包成浏览器可识别的格式。这样，我们可以使用 import 和 export 等 ES6 模块化语法来组织我们的代码。
+To use JSX here, we need to leverage some libraries, such as Webpack, Babel, or Vite.
 
-Vite 是一个现代化的构建工具，它专注于快速的开发体验。它内置了对 JSX 的支持，并且使用 ESBuild 来实现快速的构建。它可以直接将 JSX 转换为 JavaScript，而无需额外配置。
+Here's a brief comparison of these libraries for compiling JSX:
+
+<Table
+  data={{
+    headers: [
+      'Feature',
+      'Webpack',
+      'Babel',
+      'Vite',
+    ],
+    rows: [
+      [
+        'Primary Role',
+        'Module bundler with JSX support',
+        'JavaScript compiler with JSX',
+        'Build tool with built-in JSX support'
+      ],
+      [
+        'JSX Compilation',
+        'Uses Babel or similar loaders/plugins',
+        'Directly compiles JSX',
+        'Built-in support, uses ESBuild'
+      ],
+      [
+        'Configuration',
+        'Requires setting up Babel loader',
+        'Requires configuration',
+        'Minimal setup, almost zero configuration'
+      ],
+      [
+        'Speed',
+        'Slower due to additional configuration',
+        'Fast for compilation',
+        'Very fast, optimized for development'
+      ],
+    ],
+  }}
+/>
 
 
+In this case, we'll use Vite. Vite is a modern build tool focused on a fast development experience. It has built-in support for JSX and uses ESBuild for fast builds. It can directly transform JSX into JavaScript without additional configuration.
 
-我们将介绍如何使用 JSX 来简化 React 元素的创建。我们将借助 Vite 工具来实现这一点。
+### 1. Configure Vite
 
- 配置 Vite
-首先，确保你已经安装了 Vite。然后，在项目根目录下创建一个 vite.config.js 文件，并添加以下配置：
+First, ensure you have Vite installed. Then, create a vite.config.js file in your project root directory and add the following configuration:
 
 ```
 // vite.config.js
 
 export default {
   esbuild: {
-    jsxFactory: 'Didact.createElement',
-    jsxFragment: 'Didact.Fragment'
+    jsxFactory: 'MiniReact.createElement',
+    jsxFragment: 'MiniReact.Fragment'
   }
 }
 ```
 
-这里我们告诉 Vite 使用 Didact.createElement 作为 JSX 元素的工厂函数。
+Here, we tell Vite to use MiniReact.createElement as the factory function for JSX elements.
 
-现在，我们可以创建一个使用 JSX 的文件，并在其中使用 Didact.createElement 来创建 React 元素。
+Now, we can create a file using JSX and use MiniReact.createElement to create React elements.
 
-npm install -g create-vite-app
+Create a JSX file for your app:
 
-```
-
+```jsx
 // App.jsx
 
 function App() {
@@ -179,13 +226,10 @@ function App() {
   );
 }
 ```
-```
-export default App;
+Import JSX File in HTML
 
-
- 在 HTML 文件中引入 JSX 文件
-
- <!-- index.html -->
+```html
+<!-- index.html -->
 
 <!DOCTYPE html>
 <html lang="en">
@@ -206,19 +250,14 @@ export default App;
 </html>
 
 ```
-vite
+Then open your browser and visit http://localhost:3000, and you'll see your React application rendered on the page using JSX!
 
 
-然后打开浏览器访问 http://localhost:3000，你将看到使用 JSX 的 React 应用已经成功渲染到页面上了！
+## Summary
+In the first article, we've laid the groundwork for understanding and implementing the core principles of React.
 
-### step III props
-为了支持 props，确保你的 createElement 函数能够接收并正确处理传入的 props 参数。通常，props 参数是一个对象，包含了所有传递给组件的属性。
+In the next part of our series, we will delve into the enhanced core features of React, including the Virtual DOM, event binding, and the innovative Fiber architecture. 
 
+The next part is coming soon: Learning Core Features: A Deep Dive into the Principles through Building Mini-React (II) 😊
 
-
-# Conclusion
-In this first installment of our series on building a mini-React from scratch, we've laid the groundwork for understanding and implementing the core principles of React. By starting with a simple renderer and progressing through the creation of custom createElement and render functions, we have taken significant steps towards demystifying the inner workings of a powerful UI library. This approach not only solidifies your grasp on React's fundamentals but also prepares you for the more advanced features and optimizations covered in upcoming articles.
-
-In the next part of our series, we will delve into the enhanced core features of React, including the Virtual DOM, event binding, and the innovative Fiber architecture. Stay tuned to explore these concepts through hands-on development, which will further your understanding and proficiency in React.
-
-Read the next part: Enhancing Core Features in Mini-React
+Reference article: https://pomb.us/build-your-own-react/
