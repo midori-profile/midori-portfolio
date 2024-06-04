@@ -7,18 +7,16 @@ summary: ''
 ## Introduction
 
 In the software development process, the way codes are organized directly impacts team collaboration efficiency. 
-There are two mainstream code management strategies currently: ``Multi-repo`` and `Monorepo`. 
-In this article, we will discuss the practice of using a `Monorepo` to organize applications and modules within Tencent Cloud Operating System.
-
+There are two mainstream code management strategies: ``Multi-repo`` and `Monorepo`. 
+In this article, we will discuss how we use a `Monorepo` to replace the original multi-repository approach for Tencent Cloud Operating System.
 
 ## What is Monorepo?
 
-`Monorepo` is a project management strategy that allows storing multiple projects or modules within a single shared code repository. whille `Multi-repo` means each project or module resides in its own repository.
-
+A `Monorepo` is a project management strategy that allows multiple projects or modules to be stored within a single shared code repository, whereas `Multi-repo` means each project or module resides in its own separate repository.
 
 ## Why do we need to use Monorepo in our business?
 
-Before discussing `Monorepo`'s benefits, it's important to understand some `Multi-repo's` shortcomings that `Monorepo` aims to address.
+Before discussing `Monorepo`, it's important to understand some `Multi-repo's` shortcomings that `Monorepo` aims to address.
 
 ### Shortcomings of Multi-repo:
 
@@ -34,6 +32,7 @@ Before discussing `Monorepo`'s benefits, it's important to understand some `Mult
    An enum definition can repeat 10 times, including many outdated definitions.
 
    When a common module changed, updating all modules that depend on it became a cumbersome task. 
+   
    Additionally, because code was dispersed across various locations, searching through repositories often added considerable pain to the team.
 
 2. **Complex Publish Management:**
@@ -45,18 +44,16 @@ Before discussing `Monorepo`'s benefits, it's important to understand some `Mult
 ### Advantages of Using Monorepo:
 
 <ProsCard 
-  title="Monorepo" 
   pros={[
-    "Simplified Code Reuse: Since all projects reside within the same repository, sharing and reusing code becomes incredibly simple. We can reference packages at the code level, which also makes debugging much more convenient. Configuration files such as .eslintrc and tsconfig also can be reused. Then we don't have to config them over and over again.",
+    "Simplified Code Reuse: Since all projects reside within the same repository, sharing and reusing code becomes incredibly simple. We can reference packages at the code level, which also makes debugging much more convenient. Configuration files such as .eslintrc and tsconfig also can be reused. This means any engineering practice can be rapidly and effortlessly adopted across the entire team.",
     "Global Changelog: With Monorepo, the change logs of all projects can be managed collectively, simplifying the creation of a global Changelog. This is beneficial for tracking the historical changes of the entire project group, managing releases, and troubleshooting.",
-    "Improved Collaboration: Any good engineering practice will be adopted across all teams and codebases with almost zero cost through automated means. Typical examples include static code analysis, automated testing, and CI/CD."
   ]}
 />
 
-## Now, Establishing an Efficient Monorepo for Business
+## Now, Let's Establishing an Efficient Monorepo for Business
 
 <Callout emoji="💡">
-If you want to run the code directly, you can check [this repository](https://github.com/midori-profile/uni-code)
+The codebase is open-source. You can explore it [here on GitHub](https://github.com/midori-profile/uni-code).
 </Callout>
 
 
@@ -67,15 +64,12 @@ If you want to run the code directly, you can check [this repository](https://gi
   height={200}
 />
 
+### Challenges
+
+
 While Monorepo offers numerous advantages, fully unleashing its potential requires careful implementation. Here were some primary challenges our business faced:
 
-<Image
-  alt={`Website`}
-  src={`/images/uni-code/uni-5.jpg`}
-  width={800}
-  height={200}
-/>
-
+> Fundamental Challenges:
 
 1. **Dependency Tool Decision:**
    Our previous shared package was using yarn + lerna. Should we stick with it, or shift to pnpm?
@@ -83,22 +77,24 @@ While Monorepo offers numerous advantages, fully unleashing its potential requir
 2. **Cross-Project Modules Management:**
    When modules are used across front-end and back-end projects, it's vital to design a robust package structure. Creating a shared package that works seamlessly across various environments (e.g., Web, mini-apps, Node.js, Vite, Webpack) and addresses compatibility issues.
 
-3. **CI/CD Process:**
+> Advanced Challenges:
+
+3. **Changelog Management:**
    If each project has it's own changelog and independent pipelines, there will be huge management and maintenance costs. Therefore, standardized Changelog and standard pipeline are needed .
 
 4. **Server-Side Rendering (SSR) Support**
 
 5. **Adopting Mixed-Language Development (TypeScript/Rust):**
-   Using multiple programming languages ​​(such as TypeScript and Rust) is an effective way to improve performance. How to organize and manage code in these different languages ​​in `Monorepo`, ensuring that they work together without introducing additional complexity.
+   Using multiple programming languages ​​(such as TypeScript and Rust) is an effective way to improve performance. Can we find a way to organize and manage code in different languages ​​in `Monorepo`?
 
 ## Let’s talk about the solutions to each problem one by one:
 
-1. **Dependency Tool Decision (Scroll to the right to see the full content):**
+### I. **Dependency Tool Selection:**
 
 <Table
   data={{
     headers: [
-      'Feature/Issue',
+      'Feature',
       'Lerna + Yarn',
       'pnpm',
     ],
@@ -119,9 +115,9 @@ While Monorepo offers numerous advantages, fully unleashing its potential requir
         'Avoids accessing undeclared dependencies through a non-flattened `node_modules` structure'
       ],
       [
-        'Dependency Conflict Handling (Doppelgänger Issue)',
-        'Conflicts exist, `yarn duplicate` repeatedly packages compatible versions',  
-        'Effectively avoids conflicts through symlink technology and intelligent dependency resolution'
+        'Dependency Conflict Handling',
+        'When conflicts arise, yarn duplicate repeatedly packages compatible versions to resolve them.',  
+        'Effectively avoids conflicts through symlink technology'
       ],
       [
         'Support for `Monorepo`',
@@ -145,15 +141,17 @@ While Monorepo offers numerous advantages, fully unleashing its potential requir
 
 #### Conclusion: Choose pnpm
 
-Considering the significant advantages of `pnpm` in terms of dependency management efficiency, resource usage, security, and natural support for `Monorepo`, we have concluded that choosing `pnpm` as our dependency management tool is the superior decision.
+Considering the significant advantages of `pnpm` in terms of dependency management efficiency, security, and natural support for `Monorepo`, we have concluded that choosing `pnpm` as our dependency management tool is the superior decision.
 
-2. **Cross-Project Modules Management:**
+### II. **Cross-Project Modules Management:**
 
-2.1 **Module System Selection**
+### 2.1 Module System Selection
 
-JavaScript 模块化系统其发展过程大致为：CommonJS (CJS) → Asynchronous Module Definition (AMD) → Common Module Definition (CMD) → Universal Module Definition (UMD) → ECMAScript Modules (ESM)。当我们在设计 monorepo 的时候，需要针对不同的应用类型为它选择合适的模块化系统，尤其是考虑到应用间代码可以互相无缝引入
+  The evolution of JavaScript module systems can be summarized as follows: CommonJS (CJS) → Asynchronous Module Definition (AMD) → Common Module Definition (CMD) → ECMAScript Modules (ESM).
 
-目前 amd 和 cmd 语法相对复杂且构建工具支持不足，已经不是主流的模块系统了，这里我们主要对比其他的模块打包方式
+  Currently, AMD and CMD are relatively complex and lack sufficient support from build tools, making them less popular module systems.
+
+  When designing a monorepo, it is essential to choose the appropriate module system to ensure seamless code integration across applications. Here, we will compare various module bundling methods to determine the best fit for our monorepo structure.
 
 <Table
   data={{
@@ -170,8 +168,8 @@ JavaScript 模块化系统其发展过程大致为：CommonJS (CJS) → Asynchro
       ],
       [
         'Usage',
-        '• Browser<br>• Node.js ≥ 12.17',
-        '• Node.js<br>• Front-end projects (with build tools like Webpack or Rollup)'
+        '1. Browser    2. Node.js ≥ 12.17',
+        '1. Node.js 2. Front-end projects (with build tools like Webpack or Rollup'
       ],
       [
         'Tree Shaking',
@@ -182,64 +180,46 @@ JavaScript 模块化系统其发展过程大致为：CommonJS (CJS) → Asynchro
   }}
 />
 
-在了解这些模块类型后，现阶段选择模块规范的最佳实践如下：
+After understanding these module types, the best practices for choosing module specifications are as follows:
 
-共享配置模块（跨前后端）：同时发布 ESM 和 CJS 格式的包。虽然 ESM 是现代化的选择，但由于 Node.js 对 ESM 的支持仍在完善中，CJS 依然是后备选项。
+  - **Shared Configuration Modules (Cross Frontend and Backend)**: Publish packages in both ESM and CJS formats. While ESM is the modern choice, CJS remains a fallback option due to the ongoing improvements in Node.js support for ESM.
 
-UI 组件库：同时发布 ESM 和 CJS 格式的包。这样做可以确保在各种开发环境中使用这些组件库，无论是前端框架如 React 或 Vue，还是使用 Webpack 或 Rollup 打包工具。
+  - **UI Component Libraries**: Publish packages in both ESM and CJS formats. This ensures that the component libraries can be used in various development environments, whether in frontend frameworks like React or Vue or with bundling tools like Webpack or Rollup.
 
-面向 Node.js 项目：目前只需要发布 CJS 格式的包。CJS 是 Node.js 默认的模块系统，提供了稳定且广泛的支持，适合大多数后端项目需求。
+  - **For Node.js Projects**: Currently, only publish packages in CJS format. CJS is the default module system in Node.js, offering stable and extensive support, making it suitable for most backend project needs.
 
-此外，在实际项目中，还需要考虑：
-兼容性：确保模块能够在目标运行环境中无缝运行。对于需要支持旧版浏览器或 Node.js 版本的项目，可能需要额外的转码步骤（如使用 Babel）。
+  - **Compatibility**: Ensure that the modules run seamlessly in the target runtime environment. Projects that need to support older browsers or Node.js versions may require additional transpilation steps (such as using Babel).
 
-2.2 **Package Structure Design**
+### 2.2 Package Structure Design
 
-我们要设计的monorepo 需要支持 纯后端项目，前端组件库，前端项目，跨前后端库，所以我们为它设计的目录结构类似下面
-
-这里建立脚手架：基于**命令行 + inquirer + chalk**的脚手架工程，相关命令已经写入大仓自定义命令集，执行 pnpm create即初始化，针对公共库工程，ui 库工程，前端种子仓库都有对应的模版。
-
-nquirer.js 是一个 Node.js 库，它可以轻松地在命令行中创建交互式问题
-
-Chalk 是一个 Node.js 库，它可以在命令行中给文本添加颜色和格式
-
+We need to design a monorepo that supports `backend projects`, `frontend component libraries`, `frontend projects`, and `cross-frontend and backend libraries`. Therefore, we have designed the directory structure as follows:
 
 ```plaintext
 /monorepo
 │
 ├── /apps/                   # Frontend and backend applications
 │   ├── /client/             # Frontend applications
-│   │   ├── next-app         # A frontend project using Next.js (a React framework with server-side rendering capabilities)
-│   │   ├── react-app        # A frontend project using React
-│   │   ├── umi-app          # A frontend project using UmiJS (a React-based framework)
-│   │   ├── vite-app         # A frontend project using Vite (a frontend build tool)
-│   │   ├── vite-react-app   # A frontend project using Vite and React
+│   │   ├── next-app         # Next.js project(a React framework with server-side rendering capabilities)
+│   │   ├── react-app        # React project
+│   │   ├── uni-app          # uni-app (a vue-based framework)
+│   │   ├── vite-app         # Vite project
+│   │   ├── vite-react-app   # Vite and React project
 │   │
 │   ├── /service/            # Backend services
-│       ├── deno-app         # A backend project using Deno (a modern JavaScript/TypeScript runtime)
-│       ├── node-app         # A backend project using Node.js
+│       ├── deno-app         # Backend project using Deno (a modern JavaScript/TypeScript runtime)
+│       ├── node-app         # Backend project using Node.js
 │
-├── /shared/                 # Cross-frontend and backend libraries
+├── /packages/               # Shared libraries
 │   ├── /config/             # Shared configuration modules
-│   │   ├── /src/            # Source code
-│   │   ├── /tests/          # Test code
-│   │   ├── package.json     # Project configuration file
-│   │   └── ...
-│   │
 │   ├── /utils/              # Shared utility modules
-│   │   ├── /native/         # Native modules (Rust/C++ compiled to npm for Node.js)
-│   │   ├── /src/            # Source code
+│   │   ├── /native/         # Native modules (Rust/C++)
+│   │   ├── /js/             # js utils shared across front-end and back-end projects
 │   │   ├── /tests/          # Test code
 │   │   ├── package.json     # Project configuration file
-│   │   └── ...
 │   │
 │   ├── /ui/                 # Component libraries
 │   │   ├── /react/          # React components
 │   │   ├── /vue/            # Vue components
-│   │   ├── src/             # Source code
-│   │   ├── lib.rs           # Library source (for Rust-based components)
-│   │   ├── package.json     # Project configuration file
-│   │   └── ...
 │
 ├── /scripts/                # Scripts
 │   ├── build.js             # Build script
@@ -248,24 +228,26 @@ Chalk 是一个 Node.js 库，它可以在命令行中给文本添加颜色和�
 │
 ├── package.json             # Root-level project configuration file
 ├── pnpm-workspace.yaml      # PNPM workspace configuration file
-└── .gitignore               # Git ignore file
 ```
 
+We have also established a CLI tool: a command-line interface based on **Commander + Inquirer + Chalk**. The related commands are already written into the custom command set of the monorepo. Running `pnpm create` initializes the setup, and there are corresponding templates for common library projects, UI library projects, and frontend/backend seed repositories.
 
-## Introduction
+**Inquirer.js** is a Node.js library that makes it easy to create interactive command-line prompts.
 
-In this guide, we will cover how to configure and package shared modules and application projects in a Monorepo. We'll start with shared modules and then move on to an example application, such as a React project. 
+**Chalk** is a Node.js library that allows you to style text in the command-line.
 
-### 1. Shared Modules
+### 2.3 Designing a Shared Package
 
-#### 1.1 Packaging Cross-Platform Utilities
+Now, we will cover how to configure and package shared modules or application projects in a Monorepo. We'll start with shared modules and then move to an example application, such as a React project. 
 
-When packaging cross-platform utilities, it’s important to support both CommonJS (CJS) and ES Modules (ESM). We’ll use `tsup` for its ease of use and speed.
+#### 2.3.1. Shared Modules
+
+When packaging cross-platform utilities, we should support both CommonJS (CJS) and ES Modules (ESM), as concluded previously. In our project, we use `tsup` for its simplicity and speed.
 
 **Tsup Configuration Example:**
 
 ```typescript
-// packages/shared/tsup.config.ts
+// packages/utils/tsup.config.ts
 import { defineConfig } from 'tsup';
 
 export default defineConfig({
@@ -277,7 +259,7 @@ export default defineConfig({
 });
 ```
 
-**package.json Configuration for Utilities:**
+**package.json Configuration for utilities:**
 
 ```json
 {
@@ -308,8 +290,7 @@ export default defineConfig({
   }
 }
 ```
-
-#### 1.2 Packaging a UI Component Library
+#### 2.3.2. Packaging UI Component Library
 
 For a UI component library, the packaging process is similar to utilities. We need to support both CJS and ESM formats and ensure TypeScript definitions are included.
 
@@ -355,14 +336,11 @@ export default defineConfig({
   }
 }
 ```
+### 2.4 Application Example: React Project
 
-### 2. Application Example: React Project
-
-#### 2.1 Packaging and Configuring package.json
+**Packaging and Configuring package.json**
 
 For the application, such as a React project, we'll configure the `package.json` to include the necessary dependencies and scripts.
-
-**package.json Configuration:**
 
 ```json
 {
@@ -386,12 +364,9 @@ For the application, such as a React project, we'll configure the `package.json`
   }
 }
 ```
-
-#### 2.2 Importing Shared Packages
+#### 2.4.2. Importing Shared Packages in React Project
 
 In the React application, you can import the shared utilities and UI components as follows:
-
-**Example Usage in React Project:**
 
 ```javascript
 // src/index.tsx
@@ -411,16 +386,16 @@ const App = () => (
 
 ReactDOM.render(<App />, document.getElementById('root'));
 ```
+### 2.5 Additional Considerations 👀
 
-### Monorepo Considerations
+Workspace Configuration:
 
-**Workspace Configuration:**
-
-Use a package manager that supports workspaces, like PNPM, to manage dependencies efficiently.
-
+We use PNPM, which natively supports workspaces. A workspace is a set of related projects managed within one repository and benefits seamless integration between them. PNPM workspace allows easy linking of workspace projects, directly depending on the code level, rather than having to use package management / cross-repository dependencies. No need for version management.
 **Example pnpm-workspace.yaml:**
 
 ```yaml
+# This YAML file configures the workspace for PNPM.
+# It specifies the locations of the packages within the monorepo.
 packages:
   - 'apps/*'
   - 'packages/*'
@@ -428,7 +403,7 @@ packages:
 
 **Shared Dependencies:**
 
-Define shared dependencies at the root level to ensure consistency and reduce duplication.
+Define shared dependencies at the root level.
 
 **Root package.json:**
 
@@ -447,53 +422,144 @@ Define shared dependencies at the root level to ensure consistency and reduce du
   "devDependencies": {
     "eslint": "^8.5.0",
     "prettier": "^2.3.2"
-  },
-  "scripts": {
-    "build": "lerna run build",
-    "test": "lerna run test",
-    "lint": "eslint '*/**/*.{js,ts,tsx}'"
   }
 }
 ```
+For open collaboration on shared packages: it is more convenient to actively submit code for projects of other groups, such as fixing defects or implementing new features we need. However, to avoid issues brought by open collaboration,
 
-By following these guidelines, you can create a well-structured and maintainable Monorepo configuration that leverages shared dependencies and consistent tooling across your projects.
-运行：
+Code modifications should consider backward compatibility as much as possible
+After the modification is completed, automatically run unit tests of the relevant caller
+When merging requests, identify modifications to the relevant public library and automatically set the corresponding person in charge as a necessary reviewer
+Notify the testing team to conduct relevant system tests and core regression tests
+### 2.6 How to Run:
 
-pnpm start --filter "react-app"
+  - React project: pnpm start --filter "react-app"
 
-在 Node.js 项目中使用 pnpm start --filter "node-app"：
-Vite 中使用 pnpm start --filter "vite-app" ：
+  - Node.js project: pnpm start --filter "node-app"
+
+  - Vite project: pnpm start --filter "vite-app"
+
+### III. **Changelog Management:**
+
+Managing changelogs in a monorepo can be challenging due to the complexity of handling multiple projects with independent update cycles.
+
+We chose `changesets` to tackle this challenge. `changesets` is recommended by pnpm, and after our investigation, we discovered that the TikTok FE team also relies on it.
+
+Here's how `changesets` works:
+
+Each change creates a new Changeset to describe the modifications made to a particular package, thus managing version numbers.
+
+When a package fixes a bug, `changesets` records the bug fix and updates the package's version to a new release. If other packages depend on this package, `changesets` records this version change in the Changeset of these dependent packages and updates their version numbers accordingly.
+
+If multiple Changesets simultaneously modify the dependencies of the same package, `changesets` automatically merges these changes and ensures that the final dependency relationship remains valid.
 
 
-3. CI/CD Process
+#### 下面大致介绍一下我们是如何Using Changesets with PNPM
 
-If each project has several independent pipelines, the overall pipeline will be very large and there will be huge management and maintenance costs. Therefore, centralized management pipeline and standardized Changelog are needed.
+**Step 1: Install Changesets**
 
-#### How to Solve This Issue in a Monorepo
+Install Changesets as a dev dependency in your monorepo
 
-To address the challenges of managing multiple independent pipelines in a monorepo, centralized pipeline management and standardized changelog practices are essential. Here are some recommendations and tools that can help:
+```bash
+# in the root directory
+pnpm add @changesets/cli -D
+```
 
-1. **Centralized Pipeline Management:**
-   - **Nx**: Nx is a smart, fast, and extensible build system with first-class monorepo support and powerful integrations.
-   - **Turborepo**: Turborepo is a high-performance build system for JavaScript and TypeScript codebases, designed for monorepos.
+**Step 2: Initialize Changesets**
 
-2. **Standardized Changelog:**
-   - **Conventional Commits**: Adopting the Conventional Commits specification for commit messages can help standardize changelogs and automate the release process.
-   - **Semantic Release**: Semantic Release automates the versioning and package publishing process based on the commit history.
+Initialize Changesets in your repository,create a `.changeset` folder in the root of your repository with some configuration files.
 
-#### Recommended Articles and Resources
+```bash
+pnpm changeset init
+```
 
-1. **Nx Documentation**: [Nx Monorepo Documentation](https://nx.dev/getting-started/intro)
-2. **Turborepo Documentation**: [Turborepo Documentation](https://turborepo.org/docs)
-3. **Conventional Commits**: [Conventional Commits Specification](https://www.conventionalcommits.org/)
-4. **Semantic Release**: [Semantic Release Documentation](https://semantic-release.gitbook.io/semantic-release/)
-5. **Monorepo CI/CD Best Practices**: [Monorepo CI/CD Best Practices](https://www.martinfowler.com/articles/monorepos.html)
+**Step 3: Configure Changesets**
 
-These resources provide comprehensive guidance on setting up and optimizing CI/CD processes in a monorepo environment.
+Edit the `.changeset/config.json` file 
 
-4. **Server-Side Rendering (SSR) Support**
+```json
+{
+  "changelog": ["@changesets/changelog-github", { "repo": "your-org/your-repo" }],
+  "commit": false, // Specifies whether to automatically commit changesets.
+  "fixed": [], // Specifies any fixed changeset versions.
+  "linked": [], // Specifies linked changeset versions.
+  "access": "public", // The access level for published packages.
+  "baseBranch": "main", // The base branch for version bumps.
+  "updateInternalDependencies": "patch", // Specifies how to update internal dependencies.
+  "ignore": [] // Specifies any files to ignore when creating changesets.
+}
+```
 
-### 组件库设计与使用
+**Step 4: Versioning and Publishing**
+
+现在你可以正常的开发你的代码，提交 commit
+When you are ready to release a new version, run the following command to bump versions and update the changelog:
+
+```bash
+pnpm changeset version
+```
+When the **`pnpm changeset publish`** command is run, the changeset tool will compare the current state of the **`my-package`** package with the previous version stored in the version control system. If any changes are detected, the changeset tool will increment the version of the package based on the type of changes made
+
+the version of a package is updated based on the type of changes made to the package. For example, if a change is considered a "breaking" change, the version of the package would be updated to a new major version.
+
+This command will:
+
+1. Update the versions of the changed packages.
+2. Generate a new changelog entry.
+3. Commit the changes.
+
+After versioning, you can publish the packages to the registry:
+
+```bash
+pnpm publish -r
+```
+
+**Step 6: Automating with CI/CD**
+
+You can automate the versioning and publishing process using CI/CD tools ，这里我们用 GitHub Actions作为一个示例. Here’s an example workflow file (`.github/workflows/release.yml`) for GitHub Actions:
+
+```yaml
+name: Release
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: '14'
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: pnpm install
+
+      - name: Create and publish changeset
+        run: |
+          pnpm changeset version
+          git config --global user.email "you@example.com"
+          git config --global user.name "Your Name"
+          git add .
+          git commit -m "chore(release): version packages"
+          git push
+          pnpm publish -r
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+```
+
+**Summary**
+
+这就是使用 changeset 的过程，通过这种方式，我们可以更好的管理 monorepo 中的 changelog，确保版本的一致性和可追溯性。
+
+### IIII. **组件库支持服务端渲染 SSR:**
 
 #### 组件库打包
 
@@ -671,7 +737,12 @@ export default defineConfig({
 
 5. **Adopting Mixed-Language Development (TypeScript/Rust)**
 
-### Adopting Mixed-Language Development (TypeScript/Rust)
+
+
+
+
+
+### V. **Adopting Mixed-Language Development (TypeScript/Rust)**
 
 在 Monorepo 中，使用 Rust 或 Golang 编写的 npm 模块可以帮助处理一些 CPU 密集型任务。以下是如何在 Monorepo 项目中集成和使用 Rust 模块的详细说明。
 
