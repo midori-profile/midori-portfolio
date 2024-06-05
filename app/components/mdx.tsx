@@ -22,7 +22,7 @@ function Table({ data }) {
   ));
 
   return (
-    <table style={{ tableLayout: 'fixed'}}>
+    <table>
       <thead>
         <tr>{headers}</tr>
       </thead>
@@ -61,7 +61,7 @@ function RoundedImage(props) {
 
 export function Callout(props) {
   return (
-    <div className="px-4 py-3 border border-neutral-200 dark:border-neutral-700 bg-neutral-50 dark:bg-neutral-800 rounded p-1 text-sm flex items-center text-neutral-900 dark:text-neutral-100 mb-6">
+    <div className="px-4 py-3 border border-neutral-200 bg-neutral-50 rounded p-1 text-sm flex items-center text-neutral-900 mb-6">
       <div className="flex items-center w-4 mr-4">{props.emoji}</div>
       <div className="w-full callout">{props.children}</div>
     </div>
@@ -70,7 +70,7 @@ export function Callout(props) {
 
 function ProsCard({ title, pros }) {
   return (
-    <div className="border border-emerald-200 dark:border-emerald-900 bg-neutral-50 dark:bg-neutral-900 rounded-xl p-6 my-4 w-full">
+    <div className="border border-emerald-200 bg-neutral-50 rounded-xl p-6 my-4 w-full">
       {title? <span>{`You might use ${title} if...`}</span> : null}
       <div className={title? 'mt-4':''}>
         {pros.map((pro) => (
@@ -99,7 +99,7 @@ function ProsCard({ title, pros }) {
 
 function ConsCard({ title, cons }) {
   return (
-    <div className="border border-red-200 dark:border-red-900 bg-neutral-50 dark:bg-neutral-900 rounded-xl p-6 my-6 w-full">
+    <div className="border border-red-200 bg-neutral-50 rounded-xl p-6 my-6 w-full">
       <span>{`You might not use ${title} if...`}</span>
       <div className="mt-4">
         {cons.map((con) => (

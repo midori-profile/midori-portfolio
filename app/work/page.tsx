@@ -26,14 +26,14 @@ export default function WorkPage() {
           engineering solutions to both internal and external engineers to
           maximize quality and Efficiency of development.
         </p>
-        <hr className="border-neutral-100 dark:border-neutral-800" />
+        <hr className="border-neutral-100" />
       </div>
       <div className="pt-6">
         <h2 className="font-medium text-xl mb-1 tracking-tighter">
           Current Phase: Spearheading Team's Technical Architecture and
           Toolchain
         </h2>
-        <p className="mb-4 text-neutral-600 dark:text-neutral-400 text-sm">
+        <p className="mb-4 text-neutral-600 text-sm">
           maximize quality & Efficiency of development, Dec. 2021 ~ Now
         </p>
         <p className="prose prose-neutral mb-4">
@@ -87,13 +87,13 @@ export default function WorkPage() {
             </ul>
           </div>
         </div>
-        <hr className="border-neutral-100 dark:border-neutral-800" />
+        <hr className="border-neutral-100" />
       </div>
       <div className="pt-6">
         <h2 className="font-medium text-xl mb-1 tracking-tighter">
           Phase II: Addressing Business System Challenges
         </h2>
-        <p className="mb-4 text-neutral-600 dark:text-neutral-400 text-sm">
+        <p className="mb-4 text-neutral-600">
           Leading project to address business challenges and solve system
           issues, Jun. 2020 ~ Sep. 2021
         </p>
@@ -133,13 +133,13 @@ export default function WorkPage() {
             </ul>
           </div>
         </div>
-        <hr className="border-neutral-100 dark:border-neutral-800" />
+        <hr className="border-neutral-100" />
       </div>
       <div className="pt-6">
         <h2 className="font-medium text-xl mb-1 tracking-tighter">
           Phase I: Business Requirement Implementation
         </h2>
-        <p className="mb-4 text-neutral-600 dark:text-neutral-400 text-sm">
+        <p className="mb-4 text-neutral-600 text-sm">
           Concentrated on individual tasks, completing them with high quality
           and innovation, Jun. 2017 ~ Mar. 2020
         </p>

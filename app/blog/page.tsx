@@ -3,6 +3,7 @@ import { Suspense } from 'react';
 import ViewCounter from './view-counter';
 import { getViewsCount } from 'app/db/queries';
 import { getBlogPosts } from 'app/db/blog';
+import { Loading } from 'app/components/loading';
 
 export const metadata = {
   title: 'Blog',
@@ -33,10 +34,10 @@ export default function BlogPage() {
             href={`/blog/${post.slug}`}
           >
             <div className="w-full flex flex-col">
-              <p className="text-neutral-900 dark:text-neutral-100 tracking-tight">
+              <p className="text-neutral-900 tracking-tight">
                 {post.metadata.title}
               </p>
-              <Suspense fallback={<p className="h-6" />}>
+              <Suspense fallback={<Loading/>}>
                 <Views slug={post.slug} />
               </Suspense>
             </div>
