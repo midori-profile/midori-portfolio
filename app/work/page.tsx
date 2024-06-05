@@ -37,33 +37,25 @@ export default function WorkPage() {
           maximize quality & Efficiency of development, Dec. 2021 ~ Now
         </p>
         <p className="prose prose-neutral mb-4">
+        <LinkComponent href="/blog/uni-code">
           <span className="font-bold">
             Monorepo & Micro Front-End Architecture:
           </span>{" "}
-          Integrated SPA applications into one Tencent's Cloud system, supports
-          <LinkComponent href="https://en.wikipedia.org/wiki/Tencent">
-            TypeScript and Rust mixed development.
           </LinkComponent>
+          Integrated multiple SPAs into one Tencent's Cloud system, facilitating seamless collaboration across diverse domains and teams.
         </p>
         <p className="prose prose-neutral mb-4">
           <span className="font-bold">Engineering Efficiency: </span>Developed
-          an
-          <LinkComponent href="https://en.wikipedia.org/wiki/Tencent">
-            APImock platform supporting both GraphQL
-          </LinkComponent>
-          and RESTful for Tencent's CSIG as a full-stack engineer. <br></br>
-          Primary responsibility for team's CI/CD pipeline, facilitating
+          an APImock platform supporting both GraphQL and RESTful for Tencent's CSIG in a full-stack role.
+          <br></br><br></br>
+          Primary responsible for team's CI/CD pipeline, facilitating
           multi-environment deployment and PR-level E2E validation. conducted
           multiple
-          <LinkComponent href="https://en.wikipedia.org/wiki/Tencent">
-            sharing on Kubernetes
+          <LinkComponent href="/blog/beginner-guide-k8s">
+            sharing
           </LinkComponent>
-          , Pulumi, and Helm. <br></br>
-          Provided comprehensive E2E test and{" "}
-          <LinkComponent href="https://en.wikipedia.org/wiki/Tencent">
-            cypress tool{" "}
-          </LinkComponent>
-          for the team.
+          on Kubernetes, Pulumi, and Helm. <br></br>
+          {/* Provided comprehensive E2E test and automatic cypress tool for the team. */}
         </p>
         <div>
           <p className="my-0 font-bold"> Achievement：</p>
@@ -72,10 +64,7 @@ export default function WorkPage() {
               <li>
                 <span>
                   {" "}
-                  Successfully reduced project bundle size by 30% through
-                  monorepo adoption, Micro Front-End facilitating seamless
-                  collaboration across diverse domains within the Tencent Cloud
-                  Team.
+                  Successfully reduced the project bundle size by 30% through monorepo adoption and Micro Front-End architecture, facilitating seamless collaboration across diverse projects. This approach made engineering practices easier to promote and supported Rust development which significantly enhancing the performance of all projects.
                 </span>
               </li>
               <li>
@@ -93,7 +82,7 @@ export default function WorkPage() {
         <h2 className="font-medium text-xl mb-1 tracking-tighter">
           Phase II: Addressing Business System Challenges
         </h2>
-        <p className="mb-4 text-neutral-600">
+        <p className="mb-4 text-neutral-600 text-sm">
           Leading project to address business challenges and solve system
           issues, Jun. 2020 ~ Sep. 2021
         </p>
@@ -121,12 +110,11 @@ export default function WorkPage() {
               <li>
                 <span>
                   Solved performance issues such as slow start and poor runtime
-                  performance of business, resulting in a 50% reduction in
-                  startup time and a 62% reduction in first screen rendering
-                  time. Also reduced page memory consumption by 90% in extreme
+                  performance of business, resulting in almost 65% reduction in
+                  first screen loading time. Also reduced page memory consumption by 90% in extreme
                   conditions.{" "}
-                  <LinkComponent href="https://en.wikipedia.org/wiki/Tencent">
-                    see more detils here.
+                  <LinkComponent href="/blog/performance">
+                    see more details here.
                   </LinkComponent>
                 </span>
               </li>
@@ -145,10 +133,8 @@ export default function WorkPage() {
         </p>
         <p className="prose prose-neutral mb-4">
           <span className="font-bold">Baidu Mini-App framework: </span> Leading
-          technical innovations obtained 2 technical patents in Baidu. <br></br>
-          including an innovative transparent video animation solution using
-          webGL, video, and canvas that converts video files into transparent
-          channel-supported animations.<br></br> Design and develop the
+          technical innovations, obtained 2 technical patents in Baidu. <br></br>
+          including an <LinkComponent href="/blog/web-animation">high-performance web animations solution</LinkComponent>with zero development costs and high compatibility proven by billions of page views(PV).<br></br> Design and develop the
           same-layer rendering solution that allows native and HTML5 components
           to overlap and interact with each other.
         </p>
@@ -160,7 +146,7 @@ export default function WorkPage() {
                 <span>
                   Dramatically cut the cost of implementing complex animations
                   to zero and shrunk animation resource sizes by 90% compared to
-                  PNG sequences. Enhanced Baidu APP products, influencing
+                  PNG sequences. supporting large-scale events for Baidu APP products, influencing
                   billions of page views.
                 </span>
               </li>

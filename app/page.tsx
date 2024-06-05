@@ -247,24 +247,21 @@ export default function Page() {
               </summary>
               <div className="px-3 py-4">
                 <p className="prose prose-neutral">
-                  Expert in large-scale front-end frameworks, such as Vue and
+                  1. Expert in large-scale front-end frameworks, such as Vue and
                   React , Had
                   <LinkComponent href="/blog/mini-react-1">
-                    deep dive into React's source code
+                    deep dive into React's source code.
                   </LinkComponent>
                 </p>
                 <p className="prose prose-neutral">
-                  Developed the
+                  2. Developed the
                   <LinkComponent href="https://smartprogram.baidu.com/docs/develop/tutorial/intro/">
                     Baidu Mini-App framework
                   </LinkComponent>
-                  , serving 300,000 mini-program merchants, obtained
-                  <LinkComponent href="https://pss-system.cponline.cnipa.gov.cn/documents/detail?prevPageTit=changgui">
-                    2 technical patents.
-                  </LinkComponent>
+                  , serving 300,000 mini-program merchants, obtained 2 technical patents.
                 </p>
                 <p className="prose prose-neutral">
-                  Experienced in Javascript and Typescript, Founder and
+                  3. Experienced in Javascript and Typescript, Founder and
                   instructor of
                   <LinkComponent href="https://ife.baidu.com/introduction.html">
                     Baidu Front End Academy
@@ -432,7 +429,7 @@ export default function Page() {
             <li>
               <span>English -- </span>
               <span>
-                IELTS score of 7. Worked in English-speaking environments for
+                IELTS score of 7, Worked in English-speaking environments for
                 years.
               </span>
             </li>
@@ -467,7 +464,7 @@ export default function Page() {
           <LinkComponent href="https://echarts.apache.org/en/index.html">
             Echarts
           </LinkComponent>
-          team for two years. I enjoy photography and design a lot. Check some
+          team for two years. I enjoy photography and design a lot, Check some
           of my works:
         </p>
 

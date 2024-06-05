@@ -3,6 +3,7 @@ import { getGuestbookEntries } from "app/db/queries";
 import { SignIn, SignOut } from "./buttons";
 import { Suspense } from "react";
 import Form from "./form";
+import { Loading } from "app/components/loading";
 
 export const metadata = {
   title: "Guestbook",
@@ -15,7 +16,7 @@ export default function GuestbookPage() {
       <h1 className="font-medium text-2xl mb-8 tracking-tighter">
         Sign in my guestbook
       </h1>
-      <Suspense>
+      <Suspense fallback={<Loading/>}>
         <GuestbookForm />
         <GuestbookEntries />
       </Suspense>
