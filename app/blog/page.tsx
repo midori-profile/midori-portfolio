@@ -1,43 +1,30 @@
 import Link from 'next/link';
-import { Suspense, useEffect, useState } from 'react';
+import { Suspense } from 'react';
 import ViewCounter from './view-counter';
 import { getViewsCount } from 'app/db/queries';
 import { getBlogPosts } from 'app/db/blog';
-import { useRouter } from 'next/router';
 
 export const metadata = {
   title: 'Blog',
   description: 'Read my thoughts on software development, design, and more.',
 };
 
-export default function BlogPage() {
-  const router = useRouter();
-  const [loading, setLoading] = useState(false);
-  let allBlogs = getBlogPosts();
+export function Loading() {
+  return (
+    <div className="fixed top-0 left-0 w-full h-full flex items-center justify-center bg-white bg-opacity-75 z-50">
+      <div className="border-t-4 border-blue-500 rounded-full animate-spin w-10 h-10"></div>
+    </div>
+  );
+}
 
-  useEffect(() => {
-    const handleStart = () => setLoading(true);
-    const handleComplete = () => setLoading(false);
-  
-    router.events.on('routeChangeStart', handleStart);
-    router.events.on('routeChangeComplete', handleComplete);
-    router.events.on('routeChangeError', handleComplete);
-  
-    return () => {
-      router.events.off('routeChangeStart', handleStart);
-      router.events.off('routeChangeComplete', handleComplete);
-      router.events.off('routeChangeError', handleComplete);
-    };
-  }, [router]);
+export default function BlogPage() {
+  let allBlogs = getBlogPosts();
 
   return (
     <section>
       <h1 className="font-medium text-2xl mb-8 tracking-tighter">
         My Blog
       </h1>
-      {loading && (
-        <div className="border-t-4 border-blue-500 rounded-full animate-spin w-10 h-10"></div>
-      )}
       {allBlogs
         .sort((a, b) => {
           if (
@@ -57,7 +44,7 @@ export default function BlogPage() {
               <p className="text-neutral-900 tracking-tight">
                 {post.metadata.title}
               </p>
-              <Suspense fallback={<p className="h-6" />}>
+              <Suspense fallback={<Loading/>}>
                 <Views slug={post.slug} />
               </Suspense>
             </div>

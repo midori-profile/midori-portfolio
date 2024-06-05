@@ -7,6 +7,7 @@ import { getBlogPosts } from 'app/db/blog';
 import ViewCounter from '../view-counter';
 import { increment } from 'app/db/actions';
 import { unstable_noStore as noStore } from 'next/cache';
+import { Loading } from '../page';
 
 export async function generateMetadata({
   params,
@@ -118,12 +119,12 @@ export default function Blog({ params }) {
         {post.metadata.title}
       </h1>
       <div className="flex justify-between items-center mt-2 mb-8 text-sm max-w-[650px]">
-        <Suspense fallback={<p className="h-5" />}>
+        <Suspense fallback={ <Loading/> }>
           <p className="text-sm text-neutral-600">
             {formatDate(post.metadata.publishedAt)}
           </p>
         </Suspense>
-        <Suspense fallback={<p className="h-5" />}>
+        <Suspense fallback={ <Loading/> }>
           <Views slug={post.slug} />
         </Suspense>
       </div>
