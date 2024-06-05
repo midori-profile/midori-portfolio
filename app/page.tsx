@@ -170,13 +170,6 @@ export const LinkComponent: React.FC<LinkComponentProps> = ({
   href,
   children,
 }) => {
-  try {
-    new URL(href);
-  } catch (_) {
-    console.error(`Invalid URL in LinkComponent: ${href}`);
-    return null;
-  }
-
   return (
     <span>
       {" "}
