@@ -3,19 +3,12 @@ import { Suspense } from 'react';
 import ViewCounter from './view-counter';
 import { getViewsCount } from 'app/db/queries';
 import { getBlogPosts } from 'app/db/blog';
+import { Loading } from 'app/components/loading';
 
 export const metadata = {
   title: 'Blog',
   description: 'Read my thoughts on software development, design, and more.',
 };
-
-export function Loading() {
-  return (
-    <div className="fixed top-0 left-0 w-full h-full flex items-center justify-center bg-white bg-opacity-75 z-50">
-      <div className="border-t-4 border-blue-500 rounded-full animate-spin w-10 h-10"></div>
-    </div>
-  );
-}
 
 export default function BlogPage() {
   let allBlogs = getBlogPosts();

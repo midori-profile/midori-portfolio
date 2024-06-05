@@ -7,7 +7,7 @@ import { getBlogPosts } from 'app/db/blog';
 import ViewCounter from '../view-counter';
 import { increment } from 'app/db/actions';
 import { unstable_noStore as noStore } from 'next/cache';
-import { Loading } from '../page';
+import { Loading } from 'app/components/loading';
 
 export async function generateMetadata({
   params,
