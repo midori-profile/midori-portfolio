@@ -6,6 +6,7 @@ import { Navbar } from './components/nav';
 import { Analytics } from '@vercel/analytics/react';
 import { SpeedInsights } from '@vercel/speed-insights/next';
 import { SandpackCSS } from './blog/[slug]/sandpack';
+import NextNProgress from 'nextjs-progressbar';
 
 export const metadata: Metadata = {
   metadataBase: new URL('https://leerob.io'),
