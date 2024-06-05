@@ -127,7 +127,7 @@ function GuestbookEntry({ entry, children }) {
     <div className="flex flex-col space-y-1 mb-4">
       <div className="w-full text-sm break-words items-center flex">
         {children}
-        <span className="text-neutral-600 dark:text-neutral-400 mr-1 border-neutral-100">
+        <span className="text-neutral-600 mr-1 border-neutral-100">
           {entry.created_by}:
         </span>
         {entry.body}
@@ -144,9 +144,9 @@ function DeleteButton({ isActive }) {
   return (
     <button
       className={cx(
-        'px-3 py-2 border border-neutral-200 dark:border-neutral-700 bg-neutral-50 dark:bg-neutral-800 rounded p-1 text-sm inline-flex items-center leading-4 text-neutral-900 dark:text-neutral-100 mb-8 transition-all',
+        'px-3 py-2 border border-neutral-200 bg-neutral-50 rounded p-1 text-sm inline-flex items-center leading-4 text-neutral-900 mb-8 transition-all',
         {
-          'bg-red-300/50 dark:bg-red-700/50': isActive,
+          'bg-red-300/50': isActive,
         }
       )}
       disabled={pending}

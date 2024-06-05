@@ -1,8 +1,9 @@
 import Link from 'next/link';
-import { Suspense } from 'react';
+import { Suspense, useEffect, useState } from 'react';
 import ViewCounter from './view-counter';
 import { getViewsCount } from 'app/db/queries';
 import { getBlogPosts } from 'app/db/blog';
+import { useRouter } from 'next/router';
 
 export const metadata = {
   title: 'Blog',
@@ -10,13 +11,33 @@ export const metadata = {
 };
 
 export default function BlogPage() {
+  const router = useRouter();
+  const [loading, setLoading] = useState(false);
   let allBlogs = getBlogPosts();
+
+  useEffect(() => {
+    const handleStart = () => setLoading(true);
+    const handleComplete = () => setLoading(false);
+  
+    router.events.on('routeChangeStart', handleStart);
+    router.events.on('routeChangeComplete', handleComplete);
+    router.events.on('routeChangeError', handleComplete);
+  
+    return () => {
+      router.events.off('routeChangeStart', handleStart);
+      router.events.off('routeChangeComplete', handleComplete);
+      router.events.off('routeChangeError', handleComplete);
+    };
+  }, [router]);
 
   return (
     <section>
       <h1 className="font-medium text-2xl mb-8 tracking-tighter">
         My Blog
       </h1>
+      {loading && (
+        <div className="border-t-4 border-blue-500 rounded-full animate-spin w-10 h-10"></div>
+      )}
       {allBlogs
         .sort((a, b) => {
           if (
@@ -33,7 +54,7 @@ export default function BlogPage() {
             href={`/blog/${post.slug}`}
           >
             <div className="w-full flex flex-col">
-              <p className="text-neutral-900 dark:text-neutral-100 tracking-tight">
+              <p className="text-neutral-900 tracking-tight">
                 {post.metadata.title}
               </p>
               <Suspense fallback={<p className="h-6" />}>

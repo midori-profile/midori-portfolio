@@ -38,11 +38,11 @@ html {
 }
 
 .prose a {
-  @apply transition-all decoration-neutral-400 dark:decoration-neutral-600 underline-offset-2 decoration-[0.1em];
+  @apply transition-all decoration-neutral-400 underline-offset-2 decoration-[0.1em];
 }
 
 .prose .anchor:after {
-  @apply text-neutral-300 dark:text-neutral-700;
+  @apply text-neutral-300;
   content: '#';
 }
 
@@ -51,7 +51,7 @@ html {
 }
 
 .prose pre {
-  @apply bg-neutral-50 dark:bg-neutral-900 rounded-lg overflow-x-auto border border-neutral-200 dark:border-neutral-900;
+  @apply bg-neutral-50 rounded-lg overflow-x-auto border border-neutral-200;
 }
 
 .prose code {

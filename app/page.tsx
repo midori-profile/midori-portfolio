@@ -27,7 +27,7 @@ function Badge(props) {
     <a
       {...props}
       target="_blank"
-      className="inline-flex items-center rounded border border-neutral-200 bg-neutral-50 p-1 text-sm leading-4 text-neutral-900 no-underline dark:border-neutral-700 dark:bg-neutral-800 dark:text-neutral-100"
+      className="inline-flex items-center rounded border border-neutral-200 bg-neutral-50 p-1 text-sm leading-4 text-neutral-900 no-underline"
     />
   );
 }
@@ -63,7 +63,7 @@ function ChannelLink({
       <a
         href={link}
         target="_blank"
-        className="flex w-full items-center justify-between rounded border border-neutral-200 bg-neutral-50 px-3 py-4 dark:border-neutral-700 dark:bg-neutral-800"
+        className="flex w-full items-center justify-between rounded border border-neutral-200 bg-neutral-50 px-3 py-4"
       >
         <div className="flex items-center space-x-3">
           {img && (
@@ -74,7 +74,7 @@ function ChannelLink({
                 height={64}
                 width={64}
                 sizes="33vw"
-                className="h-16 w-16 rounded-full border border-neutral-200 dark:border-neutral-700"
+                className="h-16 w-16 rounded-full border border-neutral-200"
                 priority
               />
               {name === "@Midori" && (
@@ -97,7 +97,7 @@ function ChannelLink({
             </Suspense>
           </div>
         </div>
-        <div className="transform text-neutral-700 transition-transform duration-300 group-hover:-rotate-12 dark:text-neutral-300">
+        <div className="transform text-neutral-700 transition-transform duration-300 group-hover:-rotate-12">
           <ArrowIcon />
         </div>
       </a>
@@ -137,7 +137,7 @@ function BlogLink({ slug, name, subName }) {
     <div className="group">
       <a
         href={`/blog/${slug}`}
-        className="flex w-full items-center justify-between rounded border border-neutral-200 bg-neutral-50 px-3 py-4 dark:border-neutral-700 dark:bg-neutral-800"
+        className="flex w-full items-center justify-between rounded border border-neutral-200 bg-neutral-50 px-3 py-4"
       >
         <div className="flex flex-col">
           <p className="font-medium prose prose-neutral">{name}</p>
@@ -148,7 +148,7 @@ function BlogLink({ slug, name, subName }) {
             </div>
           </Suspense>
         </div>
-        <div className="transform text-neutral-700 transition-transform duration-300 group-hover:-rotate-12 dark:text-neutral-300">
+        <div className="transform text-neutral-700 transition-transform duration-300 group-hover:-rotate-12">
           <ArrowIcon />
         </div>
       </a>
@@ -396,7 +396,7 @@ export default function Page() {
         <h2 className="font-medium text-xl mb-1 tracking-tighter">
           III. My Technique Posts
         </h2>
-        <p className="prose prose-neutral dark:prose-invert">
+        <p className="prose prose-neutral">
           I enjoy learning and sharing. Below are some of my past works and
           contributions (confidential content removed).
         </p>
@@ -478,10 +478,10 @@ export default function Page() {
           of my works:
         </p>
 
-        <ul className="font-sm mt-8 flex flex-col space-x-0 space-y-2 text-neutral-600 md:flex-row md:space-x-4 md:space-y-0 dark:text-neutral-300">
+        <ul className="font-sm mt-8 flex flex-col space-x-0 space-y-2 text-neutral-600 md:flex-row md:space-x-4 md:space-y-0">
           <li>
             <a
-              className="flex items-center transition-all hover:text-neutral-800 dark:hover:text-neutral-100"
+              className="flex items-center transition-all hover:text-neutral-800"
               rel="noopener noreferrer"
               target="_blank"
               href="https://dribbble.com/midori123321"
@@ -492,7 +492,7 @@ export default function Page() {
           </li>
           <li>
             <a
-              className="flex items-center transition-all hover:text-neutral-800 dark:hover:text-neutral-100"
+              className="flex items-center transition-all hover:text-neutral-800"
               rel="noopener noreferrer"
               target="_blank"
               href="https://www.instagram.com/ivymidori/?igsh=MXBlMjd4bmx3anR2eA%3D%3D"
