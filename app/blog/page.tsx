@@ -32,6 +32,7 @@ export default function BlogPage() {
             key={post.slug}
             className="flex flex-col space-y-1 mb-4"
             href={`/blog/${post.slug}`}
+            target='_blank'
           >
             <div className="w-full flex flex-col">
               <p className="text-neutral-900 tracking-tight">
