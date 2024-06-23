@@ -1,6 +1,6 @@
 # Introduction
 
-![Portfolio Avatar](./app/avatar-portfolio.jpg | width=100 height=100)
+<img src="./app/avatar-portfolio.jpg" alt="Portfolio Avatar" width="100" height="100">
 
 **This is Midori's online portfolio, Continuously updated.**
 
