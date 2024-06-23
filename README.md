@@ -1,8 +1,8 @@
 # Introduction
 
-![Portfolio Avatar](./app/avatar-portfolio.jpg)
+![Portfolio Avatar](./app/avatar-portfolio.jpg | width=100 height=100)
 
-This is Midori's online portfolio,Continuously updated. 
+**This is Midori's online portfolio, Continuously updated.**
 
 ## Tech stack
 
