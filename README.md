@@ -1,27 +1,31 @@
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fleerob%2Fleerob.io)
+# Introduction
 
-# leerob.io
+![Portfolio Avatar](./app/avatar-portfolio.jpg)
 
-- **Framework**: [Next.js](https://nextjs.org/)
-- **Database**: [Postgres](https://vercel.com/postgres)
-- **Authentication**: [NextAuth.js](https://next-auth.js.org)
-- **Deployment**: [Vercel](https://vercel.com)
-- **Styling**: [Tailwind CSS](https://tailwindcss.com)
-- **Analytics**: [Vercel Analytics](https://vercel.com/analytics)
+This is Midori's online portfolio,Continuously updated. 
+
+## Tech stack
+
+| **Category**       | **Technology**                           |
+|--------------------|------------------------------------------|
+| Framework          | [Next.js](https://nextjs.org/)           |
+| Database           | [Postgres](https://vercel.com/postgres)  |
+| Authentication     | [NextAuth.js](https://next-auth.js.org)  |
+| Deployment         | [Vercel](https://vercel.com)             |
+| Styling            | [Tailwind CSS](https://tailwindcss.com)  |
 
 ## Running Locally
 
 This application requires Node.js v18.17+.
 
 ```bash
-git clone https://github.com/leerob/leerob.io.git
-cd leerob.io
-bun install
-bun run setup # Remove all of my personal information
-bun dev
+git clone git@github.com:midori-profile/midori-portfolio.git
+cd midori-portfolio
+pnpm install
+pnpm run start
 ```
 
-Create a `.env.local` file similar to [`.env.example`](https://github.com/leerob/leerob.io/blob/main/.env.example).
+Create a `.env.local` file similar to [`.env.example`](https://github.com/midori-profile/midori-portfolio/blob/master/.env.example)and follow the comments to set up your environment variables.
 
 ## Database Schema
 
@@ -60,10 +64,9 @@ CREATE TABLE views (
 );
 ```
 
-## License
+## Thanks
 
-1. You are free to use this code as inspiration.
-2. Please do not copy it directly.
-3. Crediting the author is appreciated.
+Feel free to use my portfolio as a template, but please remove my personal posts and content.
 
-Please remove all of my personal information (blog posts, images, etc.) by running `bun run setup`.
+Thanks to https://github.com/leerob/leerob.io for the inspiration.
+
