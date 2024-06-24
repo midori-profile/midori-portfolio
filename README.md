@@ -22,7 +22,7 @@ This application requires Node.js v18.17+.
 git clone git@github.com:midori-profile/midori-portfolio.git
 cd midori-portfolio
 pnpm install
-pnpm run start
+pnpm run dev
 ```
 
 Create a `.env.local` file similar to [`.env.example`](https://github.com/midori-profile/midori-portfolio/blob/master/.env.example)and follow the comments to set up your environment variables.
