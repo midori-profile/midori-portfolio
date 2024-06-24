@@ -3,7 +3,6 @@
   "scripts": {
     "dev": "next dev --turbo",
     "build": "next build",
-    "start": "next start",
     "setup": "node ./setup.mjs"
   },
   "dependencies": {

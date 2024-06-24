@@ -18,25 +18,29 @@ This series will be divided into three articles, The features we'll implement in
 ## I: Basic Feature Implementation
 
 **Render:** Introduced in `React 0.13 (2015)`, the render function is used to render the virtual DOM to the real DOM.
+
 **JSX:** Also introduced in `React 0.13 (2015)`, JSX syntax provides a convenient way to write component structures and converts it into calls to the createElement function.
 
 
 ## II: Enhanced Core Features
 
 **VDOM:** In `React 0.3 (2013)`, the concept of virtual DOM was introduced, used to compare and update the real DOM to improve performance.
+
 **Event Binding:** Also introduced in `React 0.3 (2013)`, event binding functionality allows components to respond to user interactions.
+
 **Task Scheduler & Fiber:** Introduced in `React 16 (2017)`, the Fiber architecture is a redesigned scheduler used to implement priority scheduling of component updates, preventing render blocking.
 
 ## III: Advanced Features and State Management
 
 **Diff Algorithm:** In `React 0.3 (2013)`, the diff algorithm based on virtual DOM was introduced, used to compare differences in virtual DOM to minimize DOM operations and improve performance.
+
 **Function Component:** In `React 16.8 (2019)`, Hooks were introduced, including useState and useEffect, as well as the implementation of function components.
+
 **useState:** Introduced in `React 16.8 (2019)`, the useState hook allows function components to have their own state.
+
 **useEffect:** Introduced in `React 16.8 (2019)`, the useEffect hook is used to handle component side effects such as data fetching and subscriptions.
 
 ## let's dive into Basic Feature Implementation
-
-
 
 ## Step One: render
 
@@ -58,17 +62,31 @@ First, let's create a basic HTML file that includes a root div element with an i
 </head>
 <body>
   <div id="root"></div>
-  <script src="main.js" type="module"></script>
+  <script src="./main.js" type="module"></script>
 </body>
 </html>
 ```
+
+```JavaScript
+// main.js
+const dom = document.createElement("div");
+dom.id = "app";
+document.querySelector("#root").append(dom);
+```
+
+Here, we have simply mounted the app. Next, we need to add some React elements inside this container, and we'll need a createElement function for that.
+
 ### 2. Create the createElement Function
 
-We'll start by implementing the createElement function from scratch. This function is used to create React elements. It accepts three parameters: type (the element type), props (the properties), and children (the child elements).
+We'll start by implementing the createElement function. This function is used to create React elements. It accepts three parameters: 
 
-Props is also introduced in `React 0.3 (2013)`,  it's an object containing all the attributes passed to the component. allowing components to receive data from parent components.
+  - type (the element type)
+  - props (the properties)
+  - children (the child elements).
 
-```
+Props is introduced in `React 0.3 (2013)`,  it's an object containing all the attributes passed to the component. allowing components to receive data from parent components.
+
+```JavaScript
 // Create the createElement function
 function createElement(type, props, ...children) {
   return {
@@ -86,9 +104,9 @@ function createElement(type, props, ...children) {
 ```
 
 Create the createTextElement Function
-We also need a function to create text node elements.which is the createTextElement Function
+We also need a function to create text node elements.
 
-```
+```JavaScript
 // Create a text node
 function createTextElement(text) {
   return {
@@ -105,9 +123,16 @@ function createTextElement(text) {
 
 Next, we'll write a simple render function that will render content into a container based on the React element passed in.
 
-```
+```JavaScript
 // Render function
-function render(element, container) {
+export function render(element, container) {
+  if (typeof element.type === 'function') {
+    const component = element.type;
+    const renderedElement = component(element.props);
+    render(renderedElement, container);
+    return;
+  }
+
   const dom =
     element.type === 'TEXT_ELEMENT'
       ? document.createTextNode('')
@@ -124,14 +149,16 @@ function render(element, container) {
     render(child, dom)
   );
 
-  container.appendChild
+  console.log('dom: ', dom);
+  container.appendChild(dom);
+}
 ```
 
 ### 4.  Create the Root Node and Render the React Element
 
 Finally, we'll get the root node and render the created React element into the root node.
 
-```
+```JavaScript
 // Create the root node
 const root = document.getElementById('root');
 
@@ -142,7 +169,28 @@ const element = createElement('div', { id: 'app' }, 'Hello, world!');
 render(element, root);
 
 ```
+
+Let's print the content of the app and see that it matches our virtual DOM
+
 Now, we have successfully implemented a simple React renderer using vanilla JavaScript that can render a div element containing text to the page.
+
+We have slightly reorganized the files into the following structure:
+
+```
+├── src 
+│   ├── App.js 
+│   ├── core 
+│   │   ├── createElement.js 
+│   │   ├── reactDom.js 
+│   │   └── render.js 
+│   ├── index.html 
+│   └── index.js 
+```
+
+<Callout emoji="💡">
+You can explore the reorganized code [here on GitHub](https://github.com/midori-profile/mini-react-tutorial).
+</Callout>
+
 
 ## Step Two: JSX
 
@@ -154,38 +202,34 @@ To use JSX here, we need to leverage some libraries, such as Webpack, Babel, or 
 
 Here's a brief comparison of these libraries for compiling JSX:
 
+好的，这是更新后的表格，表头已经更改为：JSX Compilation, Speed, Configuration。
+
 <Table
   data={{
     headers: [
       'Feature',
-      'Webpack',
-      'Babel',
-      'Vite',
+      'JSX Compilation',
+      'Speed',
+      'Configuration',
     ],
     rows: [
       [
-        'Primary Role',
-        'Module bundler with JSX support',
-        'JavaScript compiler with JSX',
-        'Build tool with built-in JSX support'
-      ],
-      [
-        'JSX Compilation',
+        'Webpack',
         'Uses Babel or similar loaders/plugins',
-        'Directly compiles JSX',
-        'Built-in support, uses ESBuild'
-      ],
-      [
-        'Configuration',
-        'Requires setting up Babel loader',
-        'Requires configuration',
-        'Minimal setup, almost zero configuration'
-      ],
-      [
-        'Speed',
         'Slower due to additional configuration',
+        'Requires setting up Babel loader'
+      ],
+      [
+        'Babel',
+        'Directly compiles JSX',
         'Fast for compilation',
-        'Very fast, optimized for development'
+        'Requires configuration'
+      ],
+      [
+        'Vite',
+        'Built-in support, uses ESBuild',
+        'Very fast, optimized for development',
+        'Minimal setup, almost zero configuration'
       ],
     ],
   }}
@@ -198,15 +242,18 @@ In this case, we'll use Vite. Vite is a modern build tool focused on a fast deve
 
 First, ensure you have Vite installed. Then, create a vite.config.js file in your project root directory and add the following configuration:
 
-```
+```JavaScript
 // vite.config.js
+import { defineConfig } from 'vite';
 
-export default {
+export default defineConfig({
+  root: 'src',
   esbuild: {
-    jsxFactory: 'MiniReact.createElement',
-    jsxFragment: 'MiniReact.Fragment'
-  }
-}
+    jsxFactory: 'createElement',
+    jsxFragment: 'Fragment',
+  },
+});
+
 ```
 
 Here, we tell Vite to use MiniReact.createElement as the factory function for JSX elements.
@@ -216,40 +263,30 @@ Now, we can create a file using JSX and use MiniReact.createElement to create Re
 Create a JSX file for your app:
 
 ```jsx
-// App.jsx
+// src/App.jsx
+import { createElement } from './core/createElement';
 
 function App() {
   return (
     <div id="app">
-      <h1>Hello, world!</h1>
+      Hello, world!
+      <NestedComponent />
     </div>
   );
 }
-```
-Import JSX File in HTML
 
-```html
-<!-- index.html -->
+function NestedComponent() {
+  return (
+    <div>
+      This is a nested component.
+    </div>
+  );
+}
 
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Simple Mini-React with JSX</title>
-</head>
-<body>
-  <div id="root"></div>
-  <script type="module">
-    import { render } from './main.js';
-    import App from './App.jsx';
-    
-    render(<App />, document.getElementById('root'));
-  </script>
-</body>
-</html>
+export default App;
 
 ```
+
 Then open your browser and visit http://localhost:3000, and you'll see your React application rendered on the page using JSX!
 
 
@@ -260,4 +297,7 @@ In the next part of our series, we will delve into the enhanced core features of
 
 The next part is coming soon: Learning Core Features: A Deep Dive into the Principles through Building Mini-React (II) 😊
 
-Reference article: https://pomb.us/build-your-own-react/
+
+## Thanks
+
+[Build your own react](https://pomb.us/build-your-own-react/)
