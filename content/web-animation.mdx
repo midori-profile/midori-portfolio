@@ -44,7 +44,8 @@ However, each traditional web animation solutions have their shortcomings. Makin
 ## Solutions
 
 <Callout emoji="💡">
-Currently, I provide React open-source components for this animation solution. Feel free to check out the [repository]((https://github.com/midori-profile/uni-code)), and if you find it helpful, please give it a star. 😊
+Currently, I provide React open-source components for this animation solution. 
+Feel free to check out the [repository](https://github.com/midori-profile/overlay-video), and if you find it helpful, please give it a star. 😊
 </Callout>
 
 To build high-performance web animations at zero development costs, we started with the following initial design plan:
@@ -78,7 +79,7 @@ Here is the general implementation process of the component. I have divided it i
 
 1. **Resources**: After the designer provides the animation files, the resources are preprocessed. The final result is an MP4 file with the animation's alpha channel information on the left side and the RGB channel information on the right side.
   - Click "Read More on Twitter" to preview the original resource example.
-  <StaticTweet id="1795466946517041425" />
+  <StaticTweet id="1803790663311593580" />
 2. **Environment**: The component sets up the drawing environment. Defines the size of the OpenGL rendering window and ensure that data from the previous rendering iteration is cleared at the start of each new iteration.
 3. **Render**: This step primarily focuses on shader processing.
 4. **Recycling**: After the component is destroyed, its resources are recycled by different kind of ways.
@@ -160,6 +161,6 @@ Here is our implementation process. This solution has been used in many major Ba
 Click the [Read more on Twitter](https://x.com/89591111112mi/status/1797271713551671394) to view the complete effect.
 <StaticTweet id="1797271713551671394" />
 
-Alternatively, visit [this page]() to preview.
+Alternatively, visit [this page](https://overlay-video-preview.vercel.app/) to preview.
 
 We hope this solution can also assist you, reducing your development pain and enabling you to create even more perfect web pages.😁

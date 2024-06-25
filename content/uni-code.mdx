@@ -454,7 +454,7 @@ When a package fixes a bug, `changesets` records the bug fix and updates the pac
 If multiple Changesets simultaneously modify the dependencies of the same package, `changesets` automatically merges these changes and ensures that the final dependency relationship remains valid.
 
 
-#### 下面大致介绍一下我们是如何Using Changesets with PNPM
+#### Below is a brief introduction to how we use Changesets with PNPM.
 
 **Step 1: Install Changesets**
 
@@ -492,9 +492,7 @@ Edit the `.changeset/config.json` file
 
 **Step 4: Versioning and Publishing**
 
-现在你可以正常的开发你的代码，提交 commit
-When you are ready to release a new version, run the following command to bump versions and update the changelog:
-
+Now you can develop your code normally and commit your changes. When you are ready to release a new version, run the following command to bump versions and update the changelog:
 ```bash
 pnpm changeset version
 ```
@@ -516,7 +514,7 @@ pnpm publish -r
 
 **Step 6: Automating with CI/CD**
 
-You can automate the versioning and publishing process using CI/CD tools ，这里我们用 GitHub Actions作为一个示例. Here’s an example workflow file (`.github/workflows/release.yml`) for GitHub Actions:
+You can automate the versioning and publishing process using CI/CD tools ，Here’s an example workflow file (`.github/workflows/release.yml`) for GitHub Actions:
 
 ```yaml
 name: Release
@@ -837,8 +835,7 @@ This integration also garnered consistent praise from our product teams for its 
 
 refernce article：
 
-https://github.com/joelparkerhenderson/monorepo-vs-polyrepo
+[monorepo-vs-polyrepo](https://github.com/joelparkerhenderson/monorepo-vs-polyrepo)
+[publish-esm-and-cjs](https://antfu.me/posts/publish-esm-and-cjs)
+[changesets-is-a-game-changer](https://brionmario.medium.com/changesets-is-a-game-changer-fe752af6a8cc)
 
-https://antfu.me/posts/publish-esm-and-cjs
-
-https://brionmario.medium.com/changesets-is-a-game-changer-fe752af6a8cc
