@@ -307,7 +307,7 @@ export default function Page() {
                 <p className="prose prose-neutral mb-2">
                   2. Led the team's CI/CD works, Experienced in CI/CD
                   methodologies, Kubernetes, Helm , Shell scripting, GitHub Actions, and{" "}
-                  <LinkComponent href="https://ife.baidu.com/introduction.html">
+                  <LinkComponent href="https://www.pulumi.com/">
                     Pulumi.
                   </LinkComponent>
                 </p>
@@ -372,7 +372,7 @@ export default function Page() {
             </a>
           </div>
          <div className="flex items-center justify-between rounded border border-neutral-200 bg-neutral-50 px-3 py-4">
-            <a target="_blank" href="https://github.com/midori-profile/code-seek">
+            <a target="_blank" href="https://github.com/midori-profile/sourcecode-seeker">
               <img
                 src="/code-seek.svg"
                 width="115"

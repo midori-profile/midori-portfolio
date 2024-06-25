@@ -37,17 +37,12 @@ export default function WorkPage() {
           maximize quality & Efficiency of development, Dec. 2021 ~ Now
         </p>
         <p className="prose prose-neutral mb-4">
-        <LinkComponent href="/blog/uni-code">
-          <span className="font-bold">
-            Monorepo & Micro Front-End Architecture:
-          </span>{" "}
-          </LinkComponent>
-          Integrated multiple SPAs into one Tencent's Cloud system, facilitating seamless collaboration across diverse domains and teams.
+          <b>Monorepo & Micro Front-End Architecture: </b>Integrated multiple SPAs into one Tencent's Cloud system, facilitating seamless collaboration across diverse domains and teams.
         </p>
         <p className="prose prose-neutral mb-4">
-          <span className="font-bold">Engineering Efficiency: </span>Developed
+          <span className="font-bold">Engineering Efficiency: </span><br></br>Developed
           an APImock platform supporting both GraphQL and RESTful for Tencent's CSIG in a full-stack role.
-          <br></br><br></br>
+          <br></br>
           Primary responsible for team's CI/CD pipeline, facilitating
           multi-environment deployment and PR-level E2E validation. conducted
           multiple
@@ -64,7 +59,7 @@ export default function WorkPage() {
               <li>
                 <span>
                   {" "}
-                  Successfully reduced the project bundle size by 30% through monorepo adoption and Micro Front-End architecture, facilitating seamless collaboration across diverse projects. This approach made engineering practices easier to promote and supported Rust development which significantly enhancing the performance of all projects.
+                  Transformed multiple SPAs into a micro-frontend architecture within a monorepo structure, enhancing cross-domain collaboration and significantly reducing code duplication. This approach notably decreased bundle size and supported hybrid language development, which greatly improved performance, especially in live streaming scenarios.
                 </span>
               </li>
               <li>
