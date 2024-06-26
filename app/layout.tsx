@@ -8,16 +8,16 @@ import { SpeedInsights } from '@vercel/speed-insights/next';
 import { SandpackCSS } from './blog/[slug]/sandpack';
 
 export const metadata: Metadata = {
-  metadataBase: new URL('https://leerob.io'),
+  metadataBase: new URL('https://midori-portfolio.vercel.app/'),
   title: {
     default: 'Midori',
     template: '%s | Midori',
   },
-  description: 'Developer, writer, and creator.',
+  description: 'Developer, designer, and photographer.',
   openGraph: {
     title: 'Midori',
-    description: 'Developer, writer, and creator.',
-    url: 'https://leerob.io',
+    description: 'Developer, designer, and photographer.',
+    url: 'https://midori-portfolio.vercel.app/',
     siteName: 'Midori',
     locale: 'en_US',
     type: 'website',
