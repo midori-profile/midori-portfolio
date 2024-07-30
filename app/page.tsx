@@ -200,7 +200,7 @@ export default function Page() {
       </div>
       <div className="pt-6">
         <p className="prose prose-neutral">
-          {`A passionate full stack developer. I am well-adapted to remote work cultures, Feel free to explore my projects on Github or my Portfolio:`}
+          {`A passionate full stack developer 😊. I am well-adapted to remote work cultures, Feel free to explore my projects on Github or my Portfolio:`}
         </p>
         <div className="my-4 flex w-full flex-col space-x-0 space-y-4 sm:flex-row sm:space-x-4 sm:space-y-0">
           <ChannelLink
