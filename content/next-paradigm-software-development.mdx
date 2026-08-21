@@ -1,0 +1,70 @@
+---
+title: "The next paradigm of software development"
+publishedAt: '2026-08-22'
+summary: "When generation becomes free, the constraint moves to verification. A note on why software is about to industrialize — and testpilot, the open-source validation layer I'm building for a world where a thousand agents write the code and machines decide what ships."
+---
+
+I've spent the last stretch building a small tool called [testpilot](https://github.com/midori-profile/testpilot). It points at any running web app, explores it, and generates real Playwright tests — then runs them and triages the failures. It started as a way to scratch my own itch: AI writes code fast now, and the thing that couldn't keep up was checking whether the code was actually right.
+
+Somewhere in the middle of building it, the point of the project changed for me.
+
+## AI isn't a faster typist
+
+The common framing is that AI makes an engineer 20% or 50% faster. I don't think that's the interesting part. What's interesting is that it changes the *unit* of software production.
+
+Writing software has always been a craft. An experienced engineer and a few others slowly press their knowledge, judgment, and taste into a codebase, decision by decision. A lot of great software has exactly that hand-made feel, and I love it for that.
+
+But for the first time, software can start to look less like a workshop and more like a factory.
+
+If a problem can be split into enough genuinely independent tasks, you can spread a lot of agents across them at once, and then use heavy automated validation to filter the results. Generation stops being the scarce step. Selection becomes the whole game.
+
+## It's the GPU logic
+
+Not every problem suits a GPU, and not every project suits this. A codebase with strong serial dependencies won't get faster with more agents — they'll just step on each other. Throwing parallelism at an inherently sequential problem buys you nothing.
+
+But when the architecture is built for parallelism, decomposition, and independent verification, the shape of the work changes completely. The ceiling stops being "how many engineers do we have" and starts being "how much validation compute can we run." And validation compute, unlike headcount, scales sideways.
+
+That reframing is the whole thing. In the old model the bottleneck was people. In this one the bottleneck is *trustworthy verification*.
+
+## Where I think it lands
+
+Here's the picture I keep coming back to.
+
+<figure>
+  <img src="/next-paradigm/pipeline.svg" alt="One requirement fans out to many agents that each draft, build, and self-test a solution; a validation gate filters them; only the winner reaches a human" style={{ width: '100%', borderRadius: '8px' }} />
+  <figcaption style={{ fontSize: '13px', color: '#6b7280', marginTop: '6px' }}>One requirement, many parallel attempts, each self-tested. Machines filter; a human reviews the survivor — not the process.</figcaption>
+</figure>
+
+A requirement comes in. Instead of one agent taking it, a hundred do — each proposing a different approach, building it, and testing its own work. Automated validation ranks what came back. A human reviews the final result, not the thousand intermediate steps.
+
+For that to be anything other than "garbage in, garbage out at scale," one thing has to hold: **the validation has to be good enough to trust without a person watching.** If it isn't, more agents just means more plausible-looking wrong answers.
+
+That is the hard problem. And it's the problem I care about.
+
+## Why validation is the real product
+
+Everyone is racing on generation — better models, bigger context, faster tokens. Far fewer people are working on the part that decides whether any of it is correct. But in an industrial model, that part *is* the assembly line's quality control, and quality control is what makes the line trustworthy enough to run unattended.
+
+This is why testpilot is built the way it is:
+
+- It **drives the real, running application** in a browser and asserts on observed behavior. A test that never ran the app can't tell you the app works.
+- The tests it generates are **deterministic, committable code** — they run in CI with no model in the loop. In a world of a thousand agents, you cannot afford a validation step that is itself a coin flip.
+- It **triages failures** (infra / config / flaky / defect), so the signal that reaches a human is a real defect, not noise.
+
+In other words: AI writes the code, but verification is what decides what ships — and verification has to be something you can run a million times, cheaply, without a human. That's the layer testpilot is trying to be.
+
+It pairs with the other half of the problem — feeding each of those agents only the context it needs, which I wrote about [last time](/blog/agent-coding-getting-slower) and benchmarked in [context-bench](https://github.com/midori-profile/context-bench). Context management is what makes a thousand agents *feasible*; validation is what makes their output *trustworthy*. You need both.
+
+## The honest part
+
+I don't think the human disappears. Two ends stay firmly in the loop: writing the spec (what do we actually want?) and judging the final result (is this the taste and quality we'll stand behind?). What collapses is everything in the middle. And the moment the middle collapses, those two ends become the new bottleneck — which is a much better bottleneck to have.
+
+There's also a ceiling: only work that can be automatically verified can be fully automated. Pure logic with tests, yes. Ambiguous product judgment, not yet. So the frontier isn't "can AI generate it" — it's "can we verify it." Every problem you make verifiable is a problem you make industrializable.
+
+## Where this goes
+
+testpilot is one brick. Today it verifies web UIs; the same idea generalizes to APIs, data pipelines, anything with an observable contract. The open question I find genuinely exciting is whether the validation layer can scale as fast as generation already has — because if it can, development capacity scales with compute, not with hiring.
+
+That's the bet. It's step one of a long walk, and open-sourcing it is the start, not the finish.
+
+If any of this resonates, take testpilot for a spin, and a star helps more people find it: **[github.com/midori-profile/testpilot](https://github.com/midori-profile/testpilot)**. I'd love to see where a community can push it.

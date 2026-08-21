@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 400" font-family="ui-sans-serif, system-ui, -apple-system, sans-serif">
+  <rect width="760" height="400" fill="#ffffff"/>
+  <text x="40" y="44" font-size="20" font-weight="700" fill="#111827">Context sent to the model, per query (tokens)</text>
+  <text x="40" y="68" font-size="13" fill="#6b7280">context-bench · 16-file repo · 18 tasks · gpt-tokenizer (cl100k_base)</text>
+
+  <line x1="40" y1="330" x2="720" y2="330" stroke="#e5e7eb" stroke-width="1"/>
+
+  <!-- stuff bar: 4108 -> full 250px -->
+  <rect x="150" y="80" width="150" height="250" rx="4" fill="#9ca3af"/>
+  <text x="225" y="72" font-size="22" font-weight="700" fill="#374151" text-anchor="middle">4108</text>
+  <text x="225" y="352" font-size="14" fill="#374151" text-anchor="middle" font-weight="600">Stuff whole repo</text>
+
+  <!-- retrieve bar: 605 -> 37px -->
+  <rect x="460" y="293" width="150" height="37" rx="4" fill="#059669"/>
+  <text x="535" y="285" font-size="22" font-weight="700" fill="#059669" text-anchor="middle">605</text>
+  <text x="535" y="352" font-size="14" fill="#374151" text-anchor="middle" font-weight="600">Retrieve top-3</text>
+
+  <!-- annotation -->
+  <line x1="300" y1="150" x2="452" y2="150" stroke="#059669" stroke-width="1.5" stroke-dasharray="4 4"/>
+  <rect x="332" y="128" width="88" height="30" rx="15" fill="#ecfdf5" stroke="#059669" stroke-width="1"/>
+  <text x="376" y="148" font-size="15" font-weight="700" fill="#059669" text-anchor="middle">6.8× less</text>
+</svg>

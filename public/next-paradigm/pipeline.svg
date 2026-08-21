@@ -1,0 +1,59 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 860 420" font-family="ui-sans-serif, system-ui, -apple-system, sans-serif">
+  <defs>
+    <marker id="ar--" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+      <path d="M0,0 L6,3 L0,6 Z" fill="#9ca3af"/>
+    </marker>
+  </defs>
+  <rect width="860" height="420" fill="#ffffff"/>
+  <text x="30" y="34" font-size="17" font-weight="700" fill="#111827">One requirement, fanned out, machine-validated</text>
+
+  <!-- requirement -->
+  <rect x="20" y="176" width="120" height="60" rx="8" fill="#111827"/>
+  <text x="80" y="205" font-size="13" fill="#fff" text-anchor="middle" font-weight="600">Requirement</text>
+  <text x="80" y="223" font-size="11" fill="#9ca3af" text-anchor="middle">the spec</text>
+
+  <!-- agents -->
+  <g font-size="11.5">
+    <rect x="210" y="70" width="200" height="38" rx="7" fill="#f3f4f6" stroke="#d1d5db"/>
+    <rect x="210" y="122" width="200" height="38" rx="7" fill="#f3f4f6" stroke="#d1d5db"/>
+    <rect x="210" y="174" width="200" height="38" rx="7" fill="#f3f4f6" stroke="#d1d5db"/>
+    <rect x="210" y="226" width="200" height="38" rx="7" fill="#f3f4f6" stroke="#d1d5db"/>
+    <text x="310" y="93" fill="#374151" text-anchor="middle">agent · draft → build → self-test</text>
+    <text x="310" y="145" fill="#374151" text-anchor="middle">agent · draft → build → self-test</text>
+    <text x="310" y="197" fill="#374151" text-anchor="middle">agent · draft → build → self-test</text>
+    <text x="310" y="249" fill="#374151" text-anchor="middle">agent · draft → build → self-test</text>
+    <text x="310" y="290" fill="#9ca3af" text-anchor="middle">… ×1000, in parallel</text>
+  </g>
+
+  <!-- requirement -> agents -->
+  <g stroke="#9ca3af" stroke-width="1.3" fill="none" marker-end="url(#ar--)">
+    <path d="M140,200 C175,150 175,110 208,89"/>
+    <path d="M140,204 C175,175 175,150 208,141"/>
+    <path d="M140,210 C175,195 180,195 208,193"/>
+    <path d="M140,214 C175,225 180,235 208,245"/>
+  </g>
+
+  <!-- validation gate -->
+  <rect x="470" y="64" width="66" height="256" rx="10" fill="#ecfdf5" stroke="#059669" stroke-width="1.5"/>
+  <text x="503" y="196" font-size="13" font-weight="700" fill="#059669" text-anchor="middle" transform="rotate(-90 503 196)">VALIDATION</text>
+
+  <!-- agents -> gate -->
+  <g stroke="#9ca3af" stroke-width="1.3" fill="none" marker-end="url(#ar--)">
+    <path d="M410,89 C440,110 445,150 468,180"/>
+    <path d="M410,141 L468,185"/>
+    <path d="M410,193 L468,193"/>
+    <path d="M410,245 C440,235 445,220 468,206"/>
+  </g>
+
+  <!-- winner -->
+  <rect x="590" y="176" width="110" height="60" rx="8" fill="#fff" stroke="#059669" stroke-width="1.8"/>
+  <text x="645" y="205" font-size="13" fill="#059669" text-anchor="middle" font-weight="700">Winner</text>
+  <text x="645" y="223" font-size="11" fill="#6b7280" text-anchor="middle">passes checks</text>
+  <path d="M536,206 L588,206" stroke="#059669" stroke-width="1.5" fill="none" marker-end="url(#ar--)"/>
+
+  <!-- human -->
+  <rect x="740" y="176" width="105" height="60" rx="8" fill="#111827"/>
+  <text x="792" y="200" font-size="12" fill="#fff" text-anchor="middle" font-weight="600">Human</text>
+  <text x="792" y="217" font-size="10.5" fill="#9ca3af" text-anchor="middle">reviews result</text>
+  <path d="M700,206 L738,206" stroke="#9ca3af" stroke-width="1.5" fill="none" marker-end="url(#ar--)"/>
+</svg>

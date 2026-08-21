@@ -1,0 +1,117 @@
+---
+title: "Has your agent coding been getting slower?"
+publishedAt: '2026-08-21'
+summary: "The model didn't get dumber — your context got heavier. Three reasons agent coding degrades over a session, seven fixes you can apply today, and a benchmark you can run yourself showing that retrieving the relevant code beats stuffing the whole repo by 6.8×."
+---
+
+A fresh session is fast. The agent drafts a plan in seconds, edits files, runs tests, keeps moving. Then you stay in that session for a while and it starts to drag. The same "make this button blue" takes noticeably longer to act on, the replies get chattier, and every so often it edits the wrong file or forgets a convention you set ten minutes ago.
+
+The model didn't get dumber. The context you're feeding it got heavier.
+
+Here's what's actually happening, and seven fixes I use that pay off the same day. Wherever I claim something helps, I try to back it with something you can run yourself.
+
+## Where the time goes
+
+**Context snowballs.** Every turn re-sends the whole history to the model: the conversation, files it read, tool definitions, loaded skills, every MCP server's schema. The longer the session, the bigger that input. And just reading your input (prefill) costs time — go from 5k to 100k tokens and time-to-first-token climbs visibly, while each call also gets more expensive.
+
+**Longer context also makes it worse at the task.** Models attend least well to the *middle* of a long context — the "lost in the middle" effect is well documented. Bury the key detail around token 40k and it often just doesn't see it. That's when you get non-answers, repeated work, and dropped conventions. It looks like the agent slowed down; really it's hunting for signal in noise.
+
+**Your cache keeps getting busted.** Every major API now does prompt caching: keep the request prefix stable and that part is served from cache, faster and cheaper. But plenty of agent tooling keeps inserting things at the *front* of the context, reordering messages, rewriting the system prompt. Change the prefix and the cache is gone — every call is recomputed from scratch. A lot of "why is it suddenly slow again" is exactly this.
+
+So the bottleneck isn't generation. It's context that's too big, cache that doesn't hit, and signal that's been diluted.
+
+## Seven fixes
+
+One thread runs through all of them: give each task only the context it actually needs. The rest is dead weight.
+
+### 1. New task, new session
+
+The blunt one, and the most effective. When a task is done, don't roll straight into an unrelated one in the same session — the history is pure noise for the new task. Switch tasks, start a session (or `/clear`). One session, one thing.
+
+Most "it got slow" cases I see are someone piling a whole day of unrelated work into a single session.
+
+### 2. Retrieve on demand; don't stuff the repo
+
+Don't dump the whole codebase or an entire doc set into context. Let the agent fetch what it needs: semantic search, grep, code navigation — pull in the few hundred relevant lines. For larger corpora, use RAG: vector search plus keyword (BM25), and for code, ideally combined with the call graph and AST, because vectors alone under-retrieve.
+
+I didn't want to just assert this, so I wrote a benchmark you can run: [`context-bench`](https://github.com/midori-profile/context-bench). A 16-file backend repo, 18 real questions, comparing "stuff the whole repo" against "retrieve only the top-3 chunks," counting tokens with a real tokenizer:
+
+<Table
+  data={{
+    headers: ['Strategy', 'Context tokens / query', 'Right file retrieved'],
+    rows: [
+      ['Stuff whole repo', '4108', '100%'],
+      ['Retrieve top-3', '605 (avg)', '94%'],
+    ],
+  }}
+/>
+
+<figure>
+  <img src="/agent-coding/tokens-chart.svg" alt="Context per query: stuffing the whole repo is 4108 tokens vs 605 for retrieving the top-3 chunks — 6.8× less" style={{ width: '100%', borderRadius: '8px', marginTop: '8px' }} />
+  <figcaption style={{ fontSize: '13px', color: '#6b7280', marginTop: '6px' }}>Stuffing costs 4108 tokens every query; retrieving only the relevant chunks averages 605, and still finds the right file 94% of the time.</figcaption>
+</figure>
+
+Retrieval cuts context to about a seventh (85% fewer tokens) while still hitting the right file 94% of the time. Latency and cost both scale with input tokens, so that 6.8× isn't rhetoric — it's roughly a 7× cut in the cost and latency of every call. Smaller slices also sidestep "lost in the middle," so quality holds up too.
+
+The bigger the codebase, the wider the gap: a real 200-file repo is millions of tokens, but the slice relevant to any single task stays tiny.
+
+You don't have to take my word for it — clone it and `npm run bench`:
+
+<figure>
+  <img src="/agent-coding/bench-terminal.png" alt="context-bench output: retrieve top-3 uses 605 tokens vs 4108 for stuffing the whole repo, 6.8× less" style={{ width: '100%', borderRadius: '8px' }} />
+  <figcaption style={{ fontSize: '13px', color: '#6b7280', marginTop: '6px' }}>The benchmark uses BM25 — deterministic and dependency-free, so anyone gets the same numbers. Hybrid retrieval (vectors + BM25, see <a href="https://github.com/midori-profile/context-lens">context-lens</a>) pushes recall higher.</figcaption>
+</figure>
+
+### 3. Don't bust the cache
+
+Put the stable things first (system prompt, project conventions, long-lived background) and the volatile things last. Stop inserting dynamic content at the top or reshuffling messages. Pin a reusable system prompt so it keeps hitting cache. This one costs almost nothing and pays back directly.
+
+### 4. Compact, and keep memory outside the chat
+
+On long sessions, periodically compress the earlier turns into a few bullet points and drop the verbatim transcript. Anything that must survive across sessions — architecture decisions, naming conventions, traps you hit — belongs in a memory or rules file, not re-narrated each time. For complex work, write a plan first and have the agent follow it, instead of hoarding the whole reasoning trace in context.
+
+### 5. Trim tools and skills
+
+Every mounted MCP server, every skill, every tool definition ships with *every* request. Twenty MCP servers and a pile of unused tools means each call carries heavy luggage. Keep only what the current project actually uses, lazy-load schemas where you can, and prune regularly.
+
+### 6. Split into sub-agents to isolate context
+
+The real fix is divide and conquer. Break a large task across sub-agents, each holding a small, scoped context and doing one thing, returning its conclusion to the main thread. The main session stays lean — it only orchestrates and merges. Each sub-agent is fast and accurate *because* its context is small, and they parallelize naturally.
+
+That's already the seed of the next way of building software. More on that in the next post.
+
+### 7. Don't use one giant model for everything
+
+Route trivial, mechanical sub-tasks to a smaller, faster model; save the big one for the hard parts. Use a fast mode if you have one. Don't send a giant model to go rename a variable.
+
+## Match the symptom
+
+<Table
+  data={{
+    headers: ['Symptom', 'Usually because', 'Do this first'],
+    rows: [
+      ['Slower the longer you use it', 'Context bloat', 'New session / /clear'],
+      ['Edits wrong file, forgets conventions', 'Lost in the middle', 'Shrink context; retrieve, don\'t stuff'],
+      ['Fast then slow, unpredictably', 'Cache getting busted', 'Stable prefix; leave the front alone'],
+      ['Slow all the time', 'Too many tools / skills', 'Trim MCP; lazy-load tools'],
+      ['Big task stalls', 'One thread carrying too much', 'Split sub-agents; isolate context'],
+    ],
+  }}
+/>
+
+## The takeaway
+
+Put these together and they point at one thing: the bottleneck in agent coding was never how fast the model writes — it's how we manage context.
+
+Generation keeps getting cheaper and faster. The scarce resource is attention: getting the right information, in the right amount, at the right moment, to the right agent. Manage that well and your agent is both fast and sharp.
+
+Which raises a more interesting question. Once generation is effectively free, and one machine runs a thousand agents — each drafting solutions, writing them, testing them, while you only look at the final result — what does building software actually look like?
+
+That's the next post.
+
+## Evidence & repos
+
+- **context-bench** — the "retrieve vs stuff" benchmark from this post; `npm run bench` reproduces it: [github.com/midori-profile/context-bench](https://github.com/midori-profile/context-bench)
+- **context-lens** — a hybrid-retrieval (vector + BM25 + RRF) knowledge base; the full retrieval layer: [github.com/midori-profile/context-lens](https://github.com/midori-profile/context-lens)
+
+*Next: "The next paradigm of software development."*
