@@ -1,0 +1,62 @@
+---
+title: "Build an AI version of yourself so recruiters can interview it first"
+publishedAt: '2026-08-18'
+summary: "A weekend project: a pixel-art, voice-driven AI clone of me that a recruiter can grill before we ever talk. It answers in my own voice, only from my real experience — and building it half-convinced me this is where hiring is going."
+---
+
+This started as a fun weekend project: an AI version of me that a recruiter could interview *before* we ever talk. By the time I finished it, I half-believed it was a glimpse of where hiring is actually headed. Let me explain — starting with why the thing it replaces is so bad.
+
+A résumé is a one-page, lossy compression of a human being. You spend years learning things, shipping things, forming opinions — and then you flatten all of it into bullet points a recruiter skims for six seconds.
+
+We've accepted this because there was no better option. Now there is.
+
+## Hiring is about to look nothing like it used to
+
+Think about how the old funnel actually works. It's **asynchronous, low-bandwidth, and gatekept**: résumé → an ATS keyword filter → a recruiter's six-second skim → *maybe* a phone screen two weeks later where you finally get to be a person. Every step throws away signal. By the time a human is genuinely curious about you, they've already decided based on a PDF.
+
+The whole thing is built around scarcity of attention. But attention isn't scarce anymore — AI can hold a real conversation, on demand, a thousand times in parallel, at 2am.
+
+So flip the funnel. What if, *before* anyone spends a human minute on you, they could just ask you anything — about a project, a trade-off you made, why you left a job — and get a real, specific, grounded answer, instantly?
+
+## So I built it
+
+Meet the AI version of me.
+
+<figure>
+  <img src="/interview-me/scene.png" alt="A pixel-art interview room: you're the interviewer, and a pixel version of me sits in the candidate's chair, answering out loud" style={{ width: '100%', borderRadius: '8px' }} />
+  <figcaption style={{ fontSize: '13px', color: '#6b7280', marginTop: '6px' }}>You're the interviewer. Pixel-me sits in the candidate's chair and answers in my own voice.</figcaption>
+</figure>
+
+It's a little pixel-art scene. **You're the interviewer.** A pixel version of me sits across the desk in the candidate's seat, and it answers you out loud — in my own cloned voice. You can just talk to it: ask about my work, or flip it into mock-interview mode and grill me like a real screen.
+
+Three things I cared about making right:
+
+- **It speaks in my actual voice.** Not a generic TTS narrator — mine. It should feel like you're talking to me, because you kind of are.
+- **It's grounded in my real experience, and it won't lie.** Everything it says comes from my actual projects and history. Ask it about something I've never done and it says "I haven't done that" instead of inventing a career. In a world drowning in confident AI nonsense, *refusing to make things up* is the whole point.
+- **It's fun.** It's pixel art. You can even redesign the little character — hair, glasses, outfit. Hiring doesn't have to feel like filling out a form.
+
+## Why I think this is the future, not a gimmick
+
+Strip away the pixels and there's a real thesis here.
+
+**Candidates become queryable.** Your "résumé" stops being a static document and becomes something an employer can *interrogate* — on their schedule, at whatever depth they want. That's a strictly higher-bandwidth channel than a PDF.
+
+**The funnel inverts.** Instead of you broadcasting into the void and hoping a human reads line 4, the employer explores you on demand. Interest comes *before* the human cost, not after.
+
+**Trust becomes the differentiator.** The instant anyone can generate a slick AI persona, the ones that matter are the ones that are *honest* — grounded in real evidence, willing to say "I don't know." An AI that hallucinates your qualifications is worse than useless; it's a liability. Grounding isn't a feature here, it's the entire value.
+
+**It's async and it scales.** Ten companies curious about you at once? They can all talk to you tonight. You're asleep.
+
+None of this replaces the human interview. It front-loads it — it filters, it gives real signal, and it makes the first contact something a person actually *wants* to do. The résumé becomes an API.
+
+## Go interview me
+
+Seriously — don't take my word for any of this. Go be the interviewer:
+
+- **The project (open source):** [github.com/midori-profile/interview-me](https://github.com/midori-profile/interview-me)
+
+If you're hiring, imagine every candidate had one of these. If you're job-hunting, steal the idea — build your own. And if you build something better, I want to see it.
+
+The résumé had a good run. I think it's time we let people meet each other before the interview even starts.
+
+*A star on the repo helps more people find it.*
