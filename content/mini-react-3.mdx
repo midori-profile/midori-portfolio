@@ -1,0 +1,296 @@
+---
+title: "Unveiling React: A Deep Dive into the Principles through Building Mini-React (III)"
+publishedAt: '2026-08-20'
+summary: "The final part of building React from scratch: reconciliation (the diff algorithm), function components, and implementing useState and useEffect by hand — including why hooks can't live inside an if."
+---
+
+## Introduction
+
+In [Part II](/blog/mini-react-2) we rebuilt the renderer on Fiber: work happens in interruptible units, and the DOM is committed atomically. But our mini-react still renders exactly once. There is no way to *update* — and updating is the entire point of React.
+
+In this final part we implement the three things that make updates work: the **diff algorithm** (reconciliation — the idea dates back to `React 0.3 (2013)`), **function components**, and the hooks from `React 16.8 (2019)`: **useState** and **useEffect**. By the end, this counter works, built on nothing but our own code:
+
+```JavaScript
+function Counter() {
+  const [count, setCount] = useState(0);
+  useEffect(() => {
+    document.title = `Count: ${count}`;
+  }, [count]);
+  return <button onClick={() => setCount(c => c + 1)}>Count: {count}</button>;
+}
+```
+
+The full runnable code lives in [`src/part-3-hooks/miniReact.js`](https://github.com/midori-profile/mini-react-tutorial/blob/master/src/part-3-hooks/miniReact.js), and the repo's demo app is exactly this counter plus a todo list.
+
+## Step One: remember the last tree
+
+You can't compute "what changed" unless you kept "what was". So the first move is bookkeeping: after every commit, save the tree we just put on screen, and give every new fiber a link to its previous version. React calls that link the **alternate**.
+
+```JavaScript
+// part-3-hooks/miniReact.js
+
+let currentRoot = null;  // the fiber tree currently on screen
+let deletions = null;    // old fibers that must be removed this commit
+
+export function render(element, container) {
+  wipRoot = {
+    dom: container,
+    props: { children: [element] },
+    alternate: currentRoot,   // link to the committed tree
+  };
+  deletions = [];
+  nextUnitOfWork = wipRoot;
+}
+
+function commitRoot() {
+  deletions.forEach(commitWork);
+  commitWork(wipRoot.child);
+  currentRoot = wipRoot;      // this tree is now "what's on screen"
+  wipRoot = null;
+}
+```
+
+Why a separate `deletions` array? Because the new tree is built from new elements — a deleted node has no place in it. If we didn't track the removals separately, nobody would ever visit those old fibers again, and their DOM would leak on screen forever.
+
+## Step Two: reconciliation — the diff algorithm
+
+In Part II, `performUnitOfWork` blindly created a new fiber for every child. Now we extract that logic into `reconcileChildren`, which walks the new elements and the old fibers **side by side** and decides, for each position, what kind of change it is:
+
+<figure>
+  <img src="/mini-react/diff-cases.svg" alt="The three reconciliation cases: same type produces UPDATE and keeps the DOM node; a changed type produces PLACEMENT for the new node plus DELETION for the old; a removed element produces DELETION" style={{ width: '100%', borderRadius: '8px' }} />
+</figure>
+
+The entire decision rests on one comparison — **is the type the same?**
+
+```JavaScript
+function reconcileChildren(wipFiber, elements) {
+  let index = 0;
+  let oldFiber = wipFiber.alternate && wipFiber.alternate.child;
+  let prevSibling = null;
+
+  while (index < elements.length || oldFiber != null) {
+    const element = elements[index];
+    let newFiber = null;
+
+    const sameType = oldFiber && element && element.type === oldFiber.type;
+
+    if (sameType) {
+      // Keep the DOM node, just patch its props.
+      newFiber = {
+        type: oldFiber.type,
+        props: element.props,
+        dom: oldFiber.dom,          // reuse!
+        parent: wipFiber,
+        alternate: oldFiber,
+        effectTag: 'UPDATE',
+      };
+    }
+    if (element && !sameType) {
+      // A different thing lives here now: create from scratch.
+      newFiber = {
+        type: element.type,
+        props: element.props,
+        dom: null,
+        parent: wipFiber,
+        alternate: null,
+        effectTag: 'PLACEMENT',
+      };
+    }
+    if (oldFiber && !sameType) {
+      // The old node has no counterpart anymore.
+      oldFiber.effectTag = 'DELETION';
+      deletions.push(oldFiber);
+    }
+
+    if (oldFiber) oldFiber = oldFiber.sibling;
+    if (index === 0) wipFiber.child = newFiber;
+    else if (element) prevSibling.sibling = newFiber;
+    prevSibling = newFiber;
+    index++;
+  }
+}
+```
+
+Each fiber now carries an `effectTag`, and the commit phase executes them:
+
+```JavaScript
+function commitWork(fiber) {
+  if (!fiber) return;
+  const domParent = fiber.parent.dom;
+
+  if (fiber.effectTag === 'PLACEMENT' && fiber.dom != null) {
+    domParent.appendChild(fiber.dom);
+  } else if (fiber.effectTag === 'UPDATE' && fiber.dom != null) {
+    updateDom(fiber.dom, fiber.alternate.props, fiber.props);
+  } else if (fiber.effectTag === 'DELETION') {
+    domParent.removeChild(fiber.dom);
+    return;
+  }
+
+  commitWork(fiber.child);
+  commitWork(fiber.sibling);
+}
+```
+
+`updateDom` compares old props against new props: remove what's gone, set what changed, and — because event listeners are props too — detach old handlers and attach new ones. (It's mechanical; see the repo for the full version.)
+
+> Real React's diff has one more famous ingredient we're skipping: **keys**. Our positional comparison thinks "list shifted by one" means "every item changed". Keys let React match children by identity instead of position and detect reorders cheaply. That, plus lane-based priorities, is most of the distance between our diff and the real one.
+
+## Step Three: function components
+
+Our demo has been calling `App()` manually. Time to support real function components — `<App />` — because hooks only make sense inside them.
+
+Two facts make function components different:
+
+1. Their children don't sit in `props.children` — they come from **calling the function**.
+2. Their fiber has **no DOM node** of its own.
+
+So `performUnitOfWork` splits in two:
+
+```JavaScript
+function performUnitOfWork(fiber) {
+  const isFunctionComponent = fiber.type instanceof Function;
+  if (isFunctionComponent) {
+    updateFunctionComponent(fiber);   // children = fiber.type(props)
+  } else {
+    updateHostComponent(fiber);       // Part II behavior
+  }
+  // ...pick next unit exactly as before
+}
+
+function updateFunctionComponent(fiber) {
+  const children = [fiber.type(fiber.props)];
+  reconcileChildren(fiber, children);
+}
+```
+
+The "no DOM" fact ripples into the commit phase: a `<div>` inside `<App>` can't append itself to `App`'s DOM node, because there isn't one. It has to climb:
+
+```JavaScript
+function commitWork(fiber) {
+  if (!fiber) return;
+
+  // Walk up until we find a fiber that actually owns a DOM node.
+  let domParentFiber = fiber.parent;
+  while (!domParentFiber.dom) {
+    domParentFiber = domParentFiber.parent;
+  }
+  const domParent = domParentFiber.dom;
+  // ...same as before
+}
+```
+
+(Deletion needs the mirror trick — climb *down* to the nearest child that owns a DOM node.)
+
+## Step Four: useState
+
+Here's the question that makes hooks interesting: `useState(0)` is called on **every render**. How does the second call know it should return `1` instead of the initial `0`? Where does the state live between renders?
+
+The answer is disarmingly simple: **in an array on the fiber, indexed by call order.**
+
+<figure>
+  <img src="/mini-react/hooks-array.svg" alt="Hooks stored as an array on the fiber: each useState/useEffect call occupies a slot by call order; on the next render the same slot is matched by position via fiber.alternate, which is why hooks cannot be called conditionally" style={{ width: '100%', borderRadius: '8px' }} />
+</figure>
+
+```JavaScript
+let wipFiber = null;
+let hookIndex = null;
+
+function updateFunctionComponent(fiber) {
+  wipFiber = fiber;
+  hookIndex = 0;
+  wipFiber.hooks = [];
+  const children = [fiber.type(fiber.props)];
+  reconcileChildren(fiber, children);
+}
+
+export function useState(initial) {
+  // Same slot as last render — matched purely by position.
+  const oldHook = wipFiber.alternate?.hooks?.[hookIndex];
+  const hook = {
+    state: oldHook ? oldHook.state : initial,
+    queue: [],
+  };
+
+  // Apply every setState queued since the last render.
+  const actions = oldHook ? oldHook.queue : [];
+  actions.forEach(action => {
+    hook.state = action instanceof Function ? action(hook.state) : action;
+  });
+
+  const setState = action => {
+    hook.queue.push(action);
+    // Kick off a re-render from the root, diffing against the current tree.
+    wipRoot = {
+      dom: currentRoot.dom,
+      props: currentRoot.props,
+      alternate: currentRoot,
+    };
+    nextUnitOfWork = wipRoot;
+    deletions = [];
+  };
+
+  wipFiber.hooks.push(hook);
+  hookIndex++;
+  return [hook.state, setState];
+}
+```
+
+Three things worth staring at:
+
+- `setState` doesn't set anything. It **queues an action and schedules a re-render**. The state actually changes on the next render, when `useState` replays the queue. That's why `setCount(c => c + 1); setCount(c => c + 1)` adds two — each action sees the previous one's result.
+- The old hook is found by `hooks[hookIndex]` — **position is the identity**. Put a hook inside an `if`, and when the condition flips, every hook after it reads its neighbor's state. This is exactly why the Rules of Hooks exist; they were never a stylistic preference.
+- The re-render starts from the root, and reconciliation makes it cheap: unchanged subtrees become `UPDATE`s that patch nothing.
+
+## Step Five: useEffect
+
+With the hooks array in place, `useEffect` is a short addition. An effect stores its `deps`; on the next render, we compare against the previous deps, and only mark it to run if something changed. Effects execute **after** the commit — the DOM the effect sees is the DOM the user sees.
+
+```JavaScript
+export function useEffect(effect, deps) {
+  const oldHook = wipFiber.alternate?.hooks?.[hookIndex];
+  const changed =
+    !oldHook || !deps || deps.some((dep, i) => dep !== oldHook.deps[i]);
+
+  wipFiber.hooks.push({
+    deps,
+    effect: changed ? effect : null,
+    cleanup: oldHook ? oldHook.cleanup : null,
+  });
+  hookIndex++;
+}
+
+function commitRoot() {
+  deletions.forEach(commitWork);
+  commitWork(wipRoot.child);
+  runEffects(wipRoot.child);   // after the DOM is real
+  currentRoot = wipRoot;
+  wipRoot = null;
+}
+
+function runEffects(fiber) {
+  if (!fiber) return;
+  fiber.hooks?.forEach(hook => {
+    if (hook.effect) {
+      if (hook.cleanup) hook.cleanup();          // clean up the previous run
+      hook.cleanup = hook.effect() || null;      // the return value is the cleanup
+    }
+  });
+  runEffects(fiber.child);
+  runEffects(fiber.sibling);
+}
+```
+
+The dependency comparison is `!==` on each slot — the same shallow comparison real React uses, and the reason "objects recreated every render" is the classic infinite-effect bug.
+
+## Wrapping Up the Series
+
+Run the [demo](https://github.com/midori-profile/mini-react-tutorial): a counter and a todo list, both fully interactive, running on ~250 lines we wrote across three articles:
+
+- **Part I** — `createElement` and a recursive renderer: the virtual DOM made concrete.
+- **Part II** — Fiber: interruptible rendering, the work loop, render/commit phases, events.
+- **Part III** — reconciliation, function components, `useState`, `useEffect`.
+
+And an honest list of what real React adds on top: **keys** for list reordering, **priority lanes** and batching in the scheduler, a **synthetic event** system, concurrent features built on the fiber architecture we sketched, and years of edge cases. None of it changes the mental model you now own — when React docs say "reconciliation", "commit phase", or "rules of hooks", you've built the thing the words point to.
+
+That was the goal all along: not to replace React, but to make it stop being magic.
