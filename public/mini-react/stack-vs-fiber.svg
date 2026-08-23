@@ -1,0 +1,48 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 860 330" font-family="ui-sans-serif, system-ui, sans-serif">
+  <rect width="860" height="330" fill="#fcfcfb"/>
+  <text x="30" y="36" font-size="17" font-weight="700" fill="#0b0b0b">Why fiber exists: one long task vs many small ones</text>
+
+  <!-- frame ticks -->
+  <g fill="#898781" font-size="11">
+    <text x="30" y="66">main thread →</text>
+  </g>
+
+  <!-- Stack reconciler row -->
+  <text x="30" y="106" font-size="13" font-weight="600" fill="#0b0b0b">Stack reconciler (React &lt; 16)</text>
+  <rect x="30" y="116" width="560" height="34" rx="4" fill="#e34948" opacity="0.85"/>
+  <text x="310" y="138" font-size="12" fill="#ffffff" text-anchor="middle" font-weight="600">render the WHOLE tree — recursive, cannot stop</text>
+  <!-- blocked user input marker -->
+  <g>
+    <line x1="230" y1="160" x2="230" y2="176" stroke="#0b0b0b" stroke-width="1.5"/>
+    <text x="236" y="174" font-size="11" fill="#52514e">user clicks… nothing happens until the very end</text>
+  </g>
+  <rect x="594" y="116" width="60" height="34" rx="4" fill="#c3c2b7"/>
+  <text x="624" y="138" font-size="11" fill="#0b0b0b" text-anchor="middle">paint</text>
+
+  <!-- Fiber row -->
+  <text x="30" y="226" font-size="13" font-weight="600" fill="#0b0b0b">Fiber (React 16, 2017)</text>
+  <g font-size="10.5">
+    <rect x="30"  y="236" width="64" height="34" rx="4" fill="#2a78d6"/>
+    <rect x="98"  y="236" width="40" height="34" rx="4" fill="#e1e0d9"/>
+    <rect x="142" y="236" width="64" height="34" rx="4" fill="#2a78d6"/>
+    <rect x="210" y="236" width="40" height="34" rx="4" fill="#e1e0d9"/>
+    <rect x="254" y="236" width="64" height="34" rx="4" fill="#2a78d6"/>
+    <rect x="322" y="236" width="68" height="34" rx="4" fill="#1baf7a"/>
+    <rect x="394" y="236" width="64" height="34" rx="4" fill="#2a78d6"/>
+    <rect x="462" y="236" width="40" height="34" rx="4" fill="#e1e0d9"/>
+    <rect x="506" y="236" width="64" height="34" rx="4" fill="#2a78d6"/>
+    <rect x="574" y="236" width="80" height="34" rx="4" fill="#eda100"/>
+    <text x="62"  y="258" fill="#fff" text-anchor="middle">unit of work</text>
+    <text x="174" y="258" fill="#fff" text-anchor="middle">unit of work</text>
+    <text x="286" y="258" fill="#fff" text-anchor="middle">unit of work</text>
+    <text x="356" y="258" fill="#fff" text-anchor="middle" font-weight="600">handle click</text>
+    <text x="426" y="258" fill="#fff" text-anchor="middle">unit of work</text>
+    <text x="538" y="258" fill="#fff" text-anchor="middle">unit of work</text>
+    <text x="614" y="258" fill="#fff" text-anchor="middle" font-weight="600">commit</text>
+    <text x="118" y="258" fill="#52514e" text-anchor="middle">idle</text>
+    <text x="230" y="258" fill="#52514e" text-anchor="middle">idle</text>
+    <text x="482" y="258" fill="#52514e" text-anchor="middle">idle</text>
+  </g>
+  <text x="30" y="298" font-size="11.5" fill="#52514e">Work is sliced into fibers; between units the browser can paint and respond. The commit at the end is the only synchronous DOM write.</text>
+  <line x1="30" y1="76" x2="830" y2="76" stroke="#e1e0d9"/>
+</svg>

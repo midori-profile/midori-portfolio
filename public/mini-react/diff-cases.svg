@@ -1,0 +1,39 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 860 360" font-family="ui-sans-serif, system-ui, sans-serif">
+  <rect width="860" height="360" fill="#fcfcfb"/>
+  <text x="30" y="36" font-size="17" font-weight="700" fill="#0b0b0b">Reconciliation: three cases, three effect tags</text>
+
+  <g font-size="12" text-anchor="middle">
+    <!-- headers -->
+    <text x="205" y="72" fill="#898781" font-weight="600">old fiber</text>
+    <text x="445" y="72" fill="#898781" font-weight="600">new element</text>
+    <text x="690" y="72" fill="#898781" font-weight="600">decision</text>
+
+    <!-- case 1: same type -->
+    <rect x="140" y="90" width="130" height="40" rx="8" fill="#ffffff" stroke="#c3c2b7" stroke-width="1.5"/>
+    <text x="205" y="115" fill="#0b0b0b">&lt;p&gt; "hello"</text>
+    <rect x="380" y="90" width="130" height="40" rx="8" fill="#ffffff" stroke="#2a78d6" stroke-width="2"/>
+    <text x="445" y="115" fill="#0b0b0b">&lt;p&gt; "world"</text>
+    <rect x="590" y="90" width="200" height="40" rx="20" fill="#eef4fc"/>
+    <text x="690" y="115" fill="#2a78d6" font-weight="700">UPDATE — keep DOM, patch props</text>
+
+    <!-- case 2: type changed -->
+    <rect x="140" y="170" width="130" height="40" rx="8" fill="#ffffff" stroke="#c3c2b7" stroke-width="1.5"/>
+    <text x="205" y="195" fill="#0b0b0b">&lt;p&gt;</text>
+    <rect x="380" y="170" width="130" height="40" rx="8" fill="#ffffff" stroke="#1baf7a" stroke-width="2"/>
+    <text x="445" y="195" fill="#0b0b0b">&lt;h2&gt;</text>
+    <rect x="590" y="150" width="200" height="36" rx="18" fill="#eafaf3"/>
+    <text x="690" y="173" fill="#0f8a5f" font-weight="700">PLACEMENT — new node</text>
+    <rect x="590" y="192" width="200" height="36" rx="18" fill="#fdeeee"/>
+    <text x="690" y="215" fill="#e34948" font-weight="700">DELETION — drop old node</text>
+
+    <!-- case 3: removed -->
+    <rect x="140" y="260" width="130" height="40" rx="8" fill="#ffffff" stroke="#c3c2b7" stroke-width="1.5"/>
+    <text x="205" y="285" fill="#0b0b0b">&lt;li&gt; "todo"</text>
+    <rect x="380" y="260" width="130" height="40" rx="8" fill="none" stroke="#c3c2b7" stroke-width="1.5" stroke-dasharray="5 5"/>
+    <text x="445" y="285" fill="#898781">(nothing)</text>
+    <rect x="590" y="260" width="200" height="40" rx="20" fill="#fdeeee"/>
+    <text x="690" y="285" fill="#e34948" font-weight="700">DELETION</text>
+  </g>
+
+  <text x="30" y="338" font-size="12" fill="#52514e">One comparison drives everything: same type or not. Tags are collected during render and executed together in the commit phase.</text>
+</svg>

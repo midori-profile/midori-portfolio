@@ -1,0 +1,238 @@
+---
+title: "Unveiling React: A Deep Dive into the Principles through Building Mini-React (II)"
+publishedAt: '2026-08-10'
+summary: "Part II of building React from scratch: why the recursive renderer had to die, how Fiber slices rendering into interruptible units of work, why render and commit became two phases, and how event binding works."
+---
+
+## Introduction
+
+In [Part I](/blog/mini-react-1), we built a working renderer: `createElement` turns JSX into a virtual DOM tree, and `render` walks that tree recursively, creating real DOM nodes as it goes. It renders our app correctly — and it has a problem serious enough that the React team spent two years rewriting the engine to fix it.
+
+In this article we'll hit that problem ourselves, then rebuild the renderer the way `React 16 (2017)` did: with **Fiber**. Along the way we'll implement the task scheduler, split rendering into a render phase and a commit phase, and add **event binding** (which real React has had since `React 0.3 (2013)`).
+
+The full runnable code for this part lives in [`src/part-2-fiber/miniReact.js`](https://github.com/midori-profile/mini-react-tutorial/blob/master/src/part-2-fiber/miniReact.js).
+
+## Step One: break the old renderer
+
+Look at Part I's `render` again:
+
+```JavaScript
+// core/render.js (Part I)
+element.props.children.forEach(child =>
+  render(child, dom)
+);
+```
+
+It's recursion. Once it starts, it doesn't stop until the entire tree is rendered. For our little demo that's fine. Now imagine a tree with ten thousand nodes: the main thread is occupied for the whole walk, and the browser can't do anything else — no painting, no responding to clicks, no running your event handlers. The page is frozen.
+
+This was the reality of React's "stack reconciler" before version 16:
+
+<figure>
+  <img src="/mini-react/stack-vs-fiber.svg" alt="Timeline comparison: the stack reconciler renders the whole tree in one long uninterruptible block, while fiber splits it into small units with idle gaps where the browser can respond" style={{ width: '100%', borderRadius: '8px' }} />
+</figure>
+
+The fix sounds simple when you say it out loud: **chop the work into small units, and after each unit, give the browser a chance to interrupt us.** Everything in this article follows from that one sentence.
+
+## Step Two: the work loop
+
+How do we know when the browser has spare time? The browser tells us. `requestIdleCallback` runs a callback when the main thread is idle, and hands it a `deadline` so we can ask *how much* idle time is left.
+
+> React doesn't actually use `requestIdleCallback` anymore — it ships its own [scheduler package](https://github.com/facebook/react/tree/main/packages/scheduler) with priority lanes — but the concept is identical, and `requestIdleCallback` is perfect for understanding it. (Safari still doesn't implement it, so we shim it with a timeout.)
+
+```JavaScript
+// part-2-fiber/miniReact.js
+
+let nextUnitOfWork = null;
+
+const idle =
+  window.requestIdleCallback ||
+  (cb => setTimeout(() => cb({ timeRemaining: () => 16 }), 1));
+
+function workLoop(deadline) {
+  let shouldYield = false;
+  while (nextUnitOfWork && !shouldYield) {
+    nextUnitOfWork = performUnitOfWork(nextUnitOfWork);
+    shouldYield = deadline.timeRemaining() < 1;
+  }
+  idle(workLoop);
+}
+idle(workLoop);
+```
+
+Read the loop carefully, because it's the heart of Fiber:
+
+1. Do one unit of work.
+2. `performUnitOfWork` returns the **next** unit.
+3. If the browser is running out of idle time, stop and yield — the loop will pick up exactly where it left off on the next idle period.
+
+We've turned rendering from a phone call you can't hang up on into a chat you can answer between other tasks. Now we need to decide what a "unit of work" actually is.
+
+## Step Three: fibers
+
+A unit of work is one element — but our virtual DOM tree isn't shaped for this. With recursion, "where am I and what's next" lives implicitly on the call stack. Once we yield, the stack is gone. We need a data structure that makes *the next piece of work* explicit.
+
+That structure is a **fiber**. One fiber per element, with three pointers:
+
+<figure>
+  <img src="/mini-react/fiber-tree.svg" alt="A fiber tree where each node links to its first child (blue), next sibling (orange), and parent (gray dashed), with the traversal order numbered" style={{ width: '100%', borderRadius: '8px' }} />
+</figure>
+
+- `child` — the first child
+- `sibling` — the next element at the same level
+- `parent` — the way back up
+
+With those three pointers, finding the next unit of work is a rule you can say in one breath: **go to your child; if you have no child, go to your sibling; if you have no sibling, climb to your parent and try its sibling.** When you climb all the way back to the root, the tree is done. It's a depth-first walk, but every step is resumable because the links live in the data, not on the call stack.
+
+## Step Four: performUnitOfWork
+
+Each unit of work does three things: create this fiber's DOM node, create fibers for its children, and pick the next unit.
+
+```JavaScript
+// part-2-fiber/miniReact.js
+
+function performUnitOfWork(fiber) {
+  // 1. Create this fiber's DOM node (just in memory for now)
+  if (!fiber.dom) {
+    fiber.dom = createDom(fiber);
+  }
+
+  // 2. Turn each child element into a fiber, linked as child/sibling
+  const elements = fiber.props.children;
+  let prevSibling = null;
+
+  elements.forEach((element, index) => {
+    const newFiber = {
+      type: element.type,
+      props: element.props,
+      parent: fiber,
+      dom: null,
+    };
+    if (index === 0) fiber.child = newFiber;
+    else prevSibling.sibling = newFiber;
+    prevSibling = newFiber;
+  });
+
+  // 3. Return the next unit of work: child → sibling → uncle
+  if (fiber.child) return fiber.child;
+  let nextFiber = fiber;
+  while (nextFiber) {
+    if (nextFiber.sibling) return nextFiber.sibling;
+    nextFiber = nextFiber.parent;
+  }
+  return null;
+}
+```
+
+`createDom` is Part I's DOM creation, extracted into a function. And `render` no longer renders anything — it just plants the first unit of work:
+
+```JavaScript
+export function render(element, container) {
+  nextUnitOfWork = {
+    dom: container,
+    props: { children: [element] },
+  };
+}
+```
+
+Run it, and the demo renders. We have an interruptible renderer. We also have a bug.
+
+## Step Five: the half-painted UI
+
+Here's the bug: if you look closely at an early version of `performUnitOfWork`, every unit appends its DOM node to its parent **immediately**. But the whole point of Fiber is that the browser can interrupt us between units — and paint. So the user can see a tree that's one-third rendered: a header with no body, a list with two items out of fifty.
+
+The stack reconciler never had this problem, ironically, *because* it blocked: nothing painted until everything was done. We broke that guarantee when we started yielding. So we need to restore it explicitly, and this is why React 16 split rendering into two phases:
+
+<figure>
+  <img src="/mini-react/render-commit.svg" alt="Render phase builds the work-in-progress tree in memory and is interruptible; commit phase applies all DOM changes synchronously in one pass" style={{ width: '100%', borderRadius: '8px' }} />
+</figure>
+
+The rule: during the work loop, **never touch the real DOM**. Build the whole fiber tree in memory — the "work-in-progress" tree. Only when there's no work left, commit the entire tree in one synchronous pass that can't be interrupted.
+
+```JavaScript
+// part-2-fiber/miniReact.js
+
+let wipRoot = null; // work-in-progress root
+
+export function render(element, container) {
+  wipRoot = {
+    dom: container,
+    props: { children: [element] },
+  };
+  nextUnitOfWork = wipRoot;
+}
+
+function workLoop(deadline) {
+  let shouldYield = false;
+  while (nextUnitOfWork && !shouldYield) {
+    nextUnitOfWork = performUnitOfWork(nextUnitOfWork);
+    shouldYield = deadline.timeRemaining() < 1;
+  }
+
+  // All units done, and a tree is waiting: commit it.
+  if (!nextUnitOfWork && wipRoot) {
+    commitRoot();
+  }
+
+  idle(workLoop);
+}
+
+function commitRoot() {
+  commitWork(wipRoot.child);
+  wipRoot = null;
+}
+
+function commitWork(fiber) {
+  if (!fiber) return;
+  fiber.parent.dom.appendChild(fiber.dom);
+  commitWork(fiber.child);
+  commitWork(fiber.sibling);
+}
+```
+
+(Remove the `appendChild` from `performUnitOfWork` — the commit phase owns the DOM now.) Notice `commitWork` is recursive and blocking, and that's *correct*: the expensive part — creating nodes, and later diffing — already happened interruptibly. Appending pre-built nodes is fast, and doing it atomically is exactly what keeps the user from seeing a torn UI.
+
+## Step Six: event binding
+
+One more thing before this part is complete. Our components can render, but they can't respond. Event handling has been in React since `React 0.3 (2013)`, and in mini-react it's a small addition to `createDom`: any prop that starts with `on` is an event listener, not a DOM property.
+
+```JavaScript
+// part-2-fiber/miniReact.js
+
+const isEvent = key => key.startsWith('on');
+const isProperty = key => key !== 'children' && !isEvent(key);
+
+function createDom(fiber) {
+  const dom =
+    fiber.type === 'TEXT_ELEMENT'
+      ? document.createTextNode('')
+      : document.createElement(fiber.type);
+
+  Object.keys(fiber.props)
+    .filter(isProperty)
+    .forEach(name => { dom[name] = fiber.props[name]; });
+
+  // onClick -> addEventListener('click', handler)
+  Object.keys(fiber.props)
+    .filter(isEvent)
+    .forEach(name => {
+      const eventType = name.toLowerCase().substring(2);
+      dom.addEventListener(eventType, fiber.props[name]);
+    });
+
+  return dom;
+}
+```
+
+Now `<button onClick={...}>` works.
+
+> Real React goes further: it implements a *synthetic event system* that (before React 17) attached one delegated listener at the document root instead of one per node, and wraps native events for cross-browser consistency. The prop-naming convention, though, is exactly this.
+
+## Wrapping Up
+
+We rebuilt the renderer around three ideas, each of which exists in real React for the exact reason we hit ourselves:
+
+1. **The work loop** — rendering yields to the browser between units, so a big tree can't freeze the page.
+2. **Fibers** — a linked structure (`child` / `sibling` / `parent`) that makes the traversal resumable after any interruption.
+3. **Render vs commit** — build in memory interruptibly, write to the DOM atomically, so the user never sees half a UI.
+
+But notice what our renderer still can't do: it renders **once**. Click a button, change some data — nothing updates, because we can only append, never compare. In [Part III](/blog/mini-react-3), we'll give mini-react a memory: the **diff algorithm** (reconciliation), **function components**, and the hooks that made `React 16.8 (2019)` famous — `useState` and `useEffect`, which we'll build from scratch.

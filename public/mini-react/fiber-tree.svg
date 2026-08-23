@@ -1,0 +1,61 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 860 400" font-family="ui-sans-serif, system-ui, sans-serif">
+  <defs>
+    <marker id="a1" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 Z" fill="#2a78d6"/></marker>
+    <marker id="a2" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 Z" fill="#eb6834"/></marker>
+    <marker id="a3" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 Z" fill="#898781"/></marker>
+  </defs>
+  <rect width="860" height="400" fill="#fcfcfb"/>
+  <text x="30" y="36" font-size="17" font-weight="700" fill="#0b0b0b">A fiber is a linked list in disguise: child, sibling, parent</text>
+
+  <!-- nodes -->
+  <g font-size="13" font-weight="600" text-anchor="middle">
+    <rect x="370" y="66" width="120" height="40" rx="8" fill="#0b0b0b"/>
+    <text x="430" y="91" fill="#ffffff">root</text>
+
+    <rect x="370" y="156" width="120" height="40" rx="8" fill="#ffffff" stroke="#2a78d6" stroke-width="2"/>
+    <text x="430" y="181" fill="#0b0b0b">&lt;div&gt;</text>
+
+    <rect x="190" y="266" width="120" height="40" rx="8" fill="#ffffff" stroke="#2a78d6" stroke-width="2"/>
+    <text x="250" y="291" fill="#0b0b0b">&lt;h1&gt;</text>
+
+    <rect x="410" y="266" width="120" height="40" rx="8" fill="#ffffff" stroke="#2a78d6" stroke-width="2"/>
+    <text x="470" y="291" fill="#0b0b0b">&lt;p&gt;</text>
+
+    <rect x="630" y="266" width="120" height="40" rx="8" fill="#ffffff" stroke="#2a78d6" stroke-width="2"/>
+    <text x="690" y="291" fill="#0b0b0b">&lt;button&gt;</text>
+  </g>
+
+  <!-- child pointers (blue, down) -->
+  <g stroke="#2a78d6" stroke-width="2" fill="none">
+    <path d="M430,106 L430,152" marker-end="url(#a1)"/>
+    <path d="M400,196 C330,220 280,240 256,262" marker-end="url(#a1)"/>
+  </g>
+  <!-- sibling pointers (orange, right) -->
+  <g stroke="#eb6834" stroke-width="2" fill="none">
+    <path d="M310,286 L406,286" marker-end="url(#a2)"/>
+    <path d="M530,286 L626,286" marker-end="url(#a2)"/>
+  </g>
+  <!-- parent pointers (gray, dashed up) -->
+  <g stroke="#898781" stroke-width="1.5" stroke-dasharray="4 4" fill="none">
+    <path d="M690,266 C640,220 520,204 484,198" marker-end="url(#a3)"/>
+  </g>
+
+  <!-- traversal order badges -->
+  <g font-size="11" font-weight="700" text-anchor="middle">
+    <circle cx="360" cy="86" r="11" fill="#1baf7a"/><text x="360" y="90" fill="#fff">1</text>
+    <circle cx="360" cy="176" r="11" fill="#1baf7a"/><text x="360" y="180" fill="#fff">2</text>
+    <circle cx="180" cy="286" r="11" fill="#1baf7a"/><text x="180" y="290" fill="#fff">3</text>
+    <circle cx="400" cy="286" r="11" fill="#1baf7a"/><text x="400" y="290" fill="#fff">4</text>
+    <circle cx="620" cy="286" r="11" fill="#1baf7a"/><text x="620" y="290" fill="#fff">5</text>
+  </g>
+
+  <!-- legend -->
+  <g font-size="12" fill="#52514e">
+    <line x1="30" y1="356" x2="62" y2="356" stroke="#2a78d6" stroke-width="2" marker-end="url(#a1)"/>
+    <text x="70" y="360">child — go deeper first</text>
+    <line x1="270" y1="356" x2="302" y2="356" stroke="#eb6834" stroke-width="2" marker-end="url(#a2)"/>
+    <text x="310" y="360">sibling — then across</text>
+    <line x1="510" y1="356" x2="542" y2="356" stroke="#898781" stroke-width="1.5" stroke-dasharray="4 4" marker-end="url(#a3)"/>
+    <text x="550" y="360">parent — climb back up to find the next sibling</text>
+  </g>
+</svg>
